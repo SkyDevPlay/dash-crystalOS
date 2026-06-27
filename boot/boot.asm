@@ -4,9 +4,16 @@
 BOOT_DISK equ 0x800
 KERNEL_LOCATION equ 0x1000
 
+UPPER_MEM equ 0x802
+EXTENDED_MEM equ 0x804
+
 
 mov [BOOT_DISK], dl
 
+mov ax, 0xE801
+int 15h
+mov word[UPPER_MEM], cx
+mov word[EXTENDED_MEM], dx
 
 mov sp, 0x4000
 mov bp, 0x4000
@@ -16,7 +23,7 @@ mov al, 0x3
 int 10h
 
 mov ah, 0x2
-mov al, 0x10
+mov al, 0x20
 mov ch, 0x0
 mov dh, 0x0
 mov cl, 0x2
@@ -79,6 +86,21 @@ start_pm:
 
 jmp $
 
-times 510-($-$$) db 0
+times 446-($-$$) db 0
+
+mbr_part_1:
+    db 0x00
+    db 0xff, 0xff, 0xff
+    db 0x83
+    db 0xff, 0xff, 0xff
+    dd 2048
+    dd 32768
+mbr_part_2:
+    dd 0, 0, 0, 0
+mbr_part_3:
+    dd 0, 0, 0, 0
+mbr_part_4:
+    dd 0, 0, 0, 0
+    
 dw 0xAA55
 
