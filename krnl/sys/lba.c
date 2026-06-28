@@ -63,19 +63,45 @@ static int ata_init_done = 0;
 static void ata_init(void) {
     if (ata_init_done) return;
     ata_init_done = 1;
-    ide_pci_init();
+
+    // Reset software
     outb(ATA_CONTROL, 0x04);
-    for (int i = 0; i < 50000; i++) inb(ATA_CONTROL);
+    for (int i = 0; i < 100000; i++) inb(ATA_CONTROL);
     outb(ATA_CONTROL, 0x00);
-    for (int i = 0; i < 50000; i++) inb(ATA_CONTROL);
+    for (int i = 0; i < 100000; i++) inb(ATA_CONTROL);
+
+    // Sélectionner master drive
     outb(ATA_DRIVE, 0xA0);
-    ata_400ns();
-    ata_wait_bsy();
-    outb(ATA_STATUS, 0xEC);  // IDENTIFY
-    if (ata_wait_drq() < 0) {
+    for (int i = 0; i < 100000; i++) inb(ATA_CONTROL);
+
+    // Attendre que BSY se lève
+    for (int i = 0; i < ATA_TIMEOUT; i++) {
+        u8 st = inb(ATA_STATUS);
+        if (st == 0xFF) continue;   // floating bus
+        if (!(st & ATA_BSY)) break;
+    }
+
+    // IDENTIFY
+    outb(ATA_DRIVE,  0xA0);
+    outb(ATA_COUNT,  0);
+    outb(ATA_LBA_LO, 0);
+    outb(ATA_LBA_MID,0);
+    outb(ATA_LBA_HI, 0);
+    outb(ATA_STATUS, 0xEC);  // IDENTIFY command
+
+    u8 status = inb(ATA_STATUS);
+    if (status == 0 || status == 0xFF) {
         printf("ATA: no disk!\n");
         return;
     }
+
+    if (ata_wait_drq() < 0) {
+        printf("ATA: IDENTIFY timeout\n");
+        return;
+    }
+
+    // Vider le buffer IDENTIFY (256 words)
+    for (int i = 0; i < 256; i++) inw(ATA_DATA);
     printf("ATA: disk OK\n");
 }
 
