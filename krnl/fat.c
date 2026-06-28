@@ -67,7 +67,7 @@ int init_fs(u32 start_sector) {
     printf("ATA status=0x%x error=0x%x\n", status, error);
     
     ata_lba_read(start_sector, 1, &bs);
-    printf("jump=%d bps=%d\n", bs.code_jump[0], bs.bytes_per_sector");
+    printf("jump=%d bps=%d\n", bs.code_jump[0], bs.bytes_per_sector);
     if (!bs.code_jump[0]) return -1;
     if (bs.bytes_per_sector != 512) return -2;
 
