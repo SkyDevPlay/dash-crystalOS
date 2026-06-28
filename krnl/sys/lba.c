@@ -71,6 +71,12 @@ static void ata_init(void) {
     outb(ATA_DRIVE, 0xA0);
     ata_400ns();
     ata_wait_bsy();
+    outb(ATA_STATUS, 0xEC);  // IDENTIFY
+    if (ata_wait_drq() < 0) {
+        printf("ATA: no disk!\n");
+        return;
+    }
+    printf("ATA: disk OK\n");
 }
 
 void ata_lba_read(u32 sector, u8 count, void *buf) {
