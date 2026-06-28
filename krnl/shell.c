@@ -12,7 +12,7 @@ static int  cmd_len = 0;
 
 static void print_prompt(void) {
     setColor(CYAN);
-    puts("D$>> ");
+    printf("D$>> ");
     setColor(WHITE);
 }
 
@@ -162,7 +162,7 @@ static void execute_command(char *input) {
 void shell_init(void) {
     reset_cmd();
     setColor(CYAN);
-    puts("\n D$-Shell initialized. Begin 'help' to understand usage of the commands.\n");
+    printf("D$hell initialized. Begin with '_help' to understand the command usage");
     setColor(WHITE);
     print_prompt();
 }
