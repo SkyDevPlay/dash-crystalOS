@@ -1,54 +1,65 @@
 #include "sys/lba.h"
+#include "io.h"
 
-#define ATA_PRIMARY 0x1F0
+#define ATA_PRIMARY  0x1F0
+#define ATA_STATUS   (ATA_PRIMARY + 7)
+#define ATA_DATA     (ATA_PRIMARY + 0)
+
+#define ATA_BSY  0x80
+#define ATA_DRQ  0x08
+#define ATA_ERR  0x01
+
+#define ATA_TIMEOUT 100000
+
+static u8 ata_wait_bsy(void) {
+    for (int i = 0; i < ATA_TIMEOUT; i++) {
+        u8 st = inb(ATA_STATUS);
+        if (!(st & ATA_BSY)) return st;
+    }
+    return 0xFF;
+}
+
+static u8 ata_wait_drq(void) {
+    for (int i = 0; i < ATA_TIMEOUT; i++) {
+        u8 st = inb(ATA_STATUS);
+        if (st & ATA_ERR) return 0xFF;
+        if (!(st & ATA_BSY) && (st & ATA_DRQ)) return st;
+    }
+    return 0xFF;
+}
 
 void ata_lba_read(u32 sector, u8 count, void *buf) {
+    if (ata_wait_bsy() == 0xFF) return;
 
+    outb(ATA_PRIMARY + 1, 0x00);
+    outb(ATA_PRIMARY + 2, count);
+    outb(ATA_PRIMARY + 3,  sector        & 0xFF);
+    outb(ATA_PRIMARY + 4, (sector >>  8) & 0xFF);
+    outb(ATA_PRIMARY + 5, (sector >> 16) & 0xFF);
+    outb(ATA_PRIMARY + 6, 0xE0 | ((sector >> 24) & 0x0F));
+    outb(ATA_PRIMARY + 7, 0x20);
 
-    
-    /*
-Send a NULL byte to port 0x1F1, if you like (it is ignored and wastes lots of CPU time): outb(0x1F1, 0x00)
-Send the sectorcount to port 0x1F2: outb(0x1F2, (unsigned char) count)
-Send the low 8 bits of the LBA to port 0x1F3: outb(0x1F3, (unsigned char) LBA))
-Send the next 8 bits of the LBA to port 0x1F4: outb(0x1F4, (unsigned char)(LBA >> 8))
-Send the next 8 bits of the LBA to port 0x1F5: outb(0x1F5, (unsigned char)(LBA >> 16))
-Send the "READ SECTORS" command (0x20) to port 0x1F7: outb(0x1F7, 0x20)
-   */
-
-    while(inb(ATA_PRIMARY+7) & 0x80);
-
-    outb(ATA_PRIMARY+1, 0x00);
-    outb(ATA_PRIMARY+2, count);
-    outb(ATA_PRIMARY+3, sector&0xFF);
-    outb(ATA_PRIMARY+4, (sector>>8)&0xFF);
-    outb(ATA_PRIMARY+5, (sector>>16)&0xFF);
-    outb(ATA_PRIMARY+6, 0xE0 | ((sector>>24)&0x0F));
-    outb(ATA_PRIMARY+7, 0x20);
-
-    for(int a = 0; a < count; a++) {
-        while(inb(ATA_PRIMARY+7) & 0x80);
-        for(char *end = buf + 512; buf != end; buf+=2) {
-            *(u16*)buf = inw(ATA_PRIMARY);
-        }
+    for (int a = 0; a < count; a++) {
+        if (ata_wait_drq() == 0xFF) return;
+        for (char *end = (char*)buf + 512; buf != (void*)end; buf += 2)
+            *(u16*)buf = inw(ATA_DATA);
     }
 }
 
 void ata_lba_write(u32 sector, u8 count, void *buf) {
-    while(inb(ATA_PRIMARY+7) & 0x80);
+    if (ata_wait_bsy() == 0xFF) return;
 
-    outb(ATA_PRIMARY+1, 0x00);
-    outb(ATA_PRIMARY+2, count);
-    outb(ATA_PRIMARY+3, sector&0xFF);
-    outb(ATA_PRIMARY+4, (sector>>8)&0xFF);
-    outb(ATA_PRIMARY+5, (sector>>16)&0xFF);
-    outb(ATA_PRIMARY+6, 0xE0 | ((sector>>24)&0x0F));
-    outb(ATA_PRIMARY+7, 0x30);
+    outb(ATA_PRIMARY + 1, 0x00);
+    outb(ATA_PRIMARY + 2, count);
+    outb(ATA_PRIMARY + 3,  sector        & 0xFF);
+    outb(ATA_PRIMARY + 4, (sector >>  8) & 0xFF);
+    outb(ATA_PRIMARY + 5, (sector >> 16) & 0xFF);
+    outb(ATA_PRIMARY + 6, 0xE0 | ((sector >> 24) & 0x0F));
+    outb(ATA_PRIMARY + 7, 0x30);
 
-    for(int a = 0; a < count; a++) {
-        while(inb(ATA_PRIMARY+7) & 0x80);
-        for(char *end = buf + 512; buf != end; buf+=2) {
-            outw(ATA_PRIMARY, *(u16*)buf);
-        }
+    for (int a = 0; a < count; a++) {
+        if (ata_wait_drq() == 0xFF) return;
+        for (char *end = (char*)buf + 512; buf != (void*)end; buf += 2)
+            outw(ATA_DATA, *(u16*)buf);
     }
 }
-
