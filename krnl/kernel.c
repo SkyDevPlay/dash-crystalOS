@@ -62,8 +62,6 @@ int main(void) {
     }
     
     shell_init();
-    setColor(CYAN);
-    puts("D$>> ");
 
     for (;;) {
         __asm__("hlt");
