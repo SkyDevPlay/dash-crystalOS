@@ -57,9 +57,9 @@ int main(void) {
 
     if (init_fs(mbr->parts[0].lba_start) < 0) {
         setColor(RED);
-        puts("ERROR: failed to mnt FATsys");
-        return 0;
-    }
+        printf("WARNING FATsystem unmounted(lba=%d)\n", mbr->parts[0].lba_start);
+        setColor(WHITE);
+}
     
     shell_init();
 
