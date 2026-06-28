@@ -23,7 +23,6 @@ void handle_keyboard(void) {
 
     u8 keycode = inb(KB_DATA);
 
-    /* Touches de modification */
     if      (keycode == LSHIFT)        is_shift = 1;
     else if (keycode == LSHIFT + 0x80) is_shift = 0;
     else if (keycode == LMAJ)          is_shift = !is_shift;
@@ -44,7 +43,7 @@ int main(void) {
     u16 upper_memory    = *((u16 *)0x802);
     u16 extended_memory = *((u16 *)0x804);
     u32 available_memory = 1024u * (low_memory + upper_memory + extended_memory * 64u);
-    printf("Memoire disponible : %d Ko\n", available_memory / 1024);
+    printf("Memory available : %d Ko\n", available_memory / 1024);
 
     if (init_malloc(available_memory) < 0) {
         setColor(RED);
@@ -52,22 +51,18 @@ int main(void) {
         return 0;
     }
 
-    /* 3. Port série (debug QEMU via -serial stdio) */
     if (initSerial(coms[0])) {
         printf("Serial port failed to initialize\n");
     }
 
-    /* 4. Système de fichiers FAT (partition 0) */
     if (init_fs(mbr->parts[0].lba_start) < 0) {
         setColor(RED);
         puts("ERROR: failed to mnt FATsys");
         return 0;
     }
-
-    /* 5. Lancement du shell */
+    
     shell_init();
 
-    /* 6. Boucle principale — tout passe par les interruptions */
     for (;;) {
         __asm__("hlt");
     }
