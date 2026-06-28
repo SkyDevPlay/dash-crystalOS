@@ -1,0 +1,5 @@
+qemu-system-i386 -m 512M \
+  -drive file=os.bin,format=raw,if=none,id=hd0 \
+  -device piix3-ide,id=ide0 \
+  -device ide-hd,bus=ide0.0,drive=hd0 \
+  -serial stdio
