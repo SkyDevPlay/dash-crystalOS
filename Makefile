@@ -1,11 +1,12 @@
 AS=nasm
 
+TOOLCHAIN=/home/sky/opt/cross
 TOOLCHAIN_BIN= $(TOOLCHAIN)/bin
 TOOLCHAIN_PREFIX?=i686-elf
 
 export CC=$(TOOLCHAIN_BIN)/$(TOOLCHAIN_PREFIX)-gcc
 export LD=$(TOOLCHAIN_BIN)/$(TOOLCHAIN_PREFIX)-ld
-CFLAGS=-Wall -Wextra -Iinclude -nolibc -nostdlib -ffreestanding -fpack-struct
+CFLAGS=-Wall -Wextra -Iinclude -nostdlib -ffreestanding -fpack-struct
 LDFLAGS=-T linker.ld --oformat binary -Map=layout.map
 
 OBJDIR=obj
