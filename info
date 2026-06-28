@@ -1,4 +1,13 @@
-make clean && make
+# Monter part.bin et ajouter un fichier
+mkdir -p /tmp/mnt
+sudo mount -o loop part.bin /tmp/mnt
+echo "Hello CrystalOS!" | sudo tee /tmp/mnt/TEST.TXT
+sudo umount /tmp/mnt
+
+# Rebuilder os.bin (qui inclut part.bin)
+make
+
+# Relancer
 qemu-system-i386 -m 512M \
   -drive file=os.bin,format=raw,if=none,id=hd0 \
   -device piix3-ide,id=ide0 \
