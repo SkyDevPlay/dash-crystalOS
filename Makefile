@@ -37,7 +37,7 @@ all: os.bin
 
 os.bin: obj/boot obj/kernel.bin part.bin
 	@echo "OUT   $@"
-	@dd if=/dev/zero      of=os.bin bs=512 count=2048
+	@dd if=/dev/zero      of=os.bin bs=512 count=67584
 	@dd if=obj/boot       of=os.bin bs=512           conv=notrunc
 	@dd if=obj/kernel.bin of=os.bin bs=512 seek=1    conv=notrunc
 	@dd if=part.bin       of=os.bin bs=512 seek=2048 conv=notrunc
