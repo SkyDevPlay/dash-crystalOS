@@ -20,7 +20,8 @@ C_SRCS= \
     krnl/malloc.c \
     krnl/sys/ps2.c \
 	krnl/sys/io.c \
-	krnl/sys/serial.c
+	krnl/sys/serial.c \
+	krnl/sys/keymap.c
 
 ASM_SRCS= \
     krnl/link.asm \
