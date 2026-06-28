@@ -67,7 +67,7 @@ debug: os.bin
 	qemu-system-i386 -m 512M -hda $< -s -S
 
 run: os.bin
-	qemu-system-i386 -m 512M -drive format=raw,file=$< -serial stdio
+	qemu-system-i386 -m 512M -drive format=raw,file=$<,if=ide,index=0,media=disk -serial stdio
 
 clean:
 	rm -fr obj os.bin layout.map
