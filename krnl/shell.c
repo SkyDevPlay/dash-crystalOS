@@ -161,11 +161,8 @@ static void execute_command(char *input) {
 
 void shell_init(void) {
     reset_cmd();
-<<<<<<< HEAD
     setColor(CYAN);
     puts("D$-Shell initialized. Begin with '_help' to understand the command usage");
-=======
->>>>>>> 050e6fdef96f833be0f7ef5bba424842706b8c9c
     setColor(WHITE);
     putchar('S');
     putchar('H');
