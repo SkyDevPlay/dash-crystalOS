@@ -62,7 +62,12 @@ void clean_entry(struct fat_dir_entry *entry) {
         if (entry->extension[i] == ' ') entry->extension[i] = 0;
 }
 int init_fs(u32 start_sector) {
+    u8 status = inb(0x1F7);
+    u8 error  = inb(0x1F1);
+    printf("ATA status=0x%x error=0x%x\n", status, error);
+    
     ata_lba_read(start_sector, 1, &bs);
+    printf("jump=%d bps=%d\n", bs.code_jump[0], bs.bytes_per_sector);
     if (!bs.code_jump[0]) return -1;
     if (bs.bytes_per_sector != 512) return -2;
 
