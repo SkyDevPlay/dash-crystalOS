@@ -1,8 +1,5 @@
-# 1. Créer une image de 1 Mo (2048 secteurs × 512 octets)
-dd if=/dev/zero of=part.bin bs=512 count=2048
-
-# 2. Formater en FAT16
-mkfs.fat -F 16 -S 512 -s 4 -r 512 -n "CRYSTALOS" part.bin
+dd if=/dev/zero of=part.bin bs=512 count=65536
+mkfs.fat -F 16 -S 512 -s 4 -r 512 -n "DASHCRYSTALOS" part.bin
 # Monter et ajouter un fichier (Linux)
 mkdir -p /tmp/mnt
 sudo mount -o loop part.bin /tmp/mnt
