@@ -1,5 +1,10 @@
-qemu-system-i386 -m 512M \
-  -drive file=os.bin,format=raw,if=none,id=hd0 \
-  -device piix3-ide,id=ide0 \
-  -device ide-hd,bus=ide0.0,drive=hd0 \
-  -serial stdio
+# 1. Créer une image de 1 Mo (2048 secteurs × 512 octets)
+dd if=/dev/zero of=part.bin bs=512 count=2048
+
+# 2. Formater en FAT16
+mkfs.fat -F 16 -S 512 -s 4 -r 512 -n "CRYSTALOS" part.bin
+# Monter et ajouter un fichier (Linux)
+mkdir -p /tmp/mnt
+sudo mount -o loop part.bin /tmp/mnt
+echo "Hello CrystalOS!" | sudo tee /tmp/mnt/TEST.TXT
+sudo umount /tmp/mnt
