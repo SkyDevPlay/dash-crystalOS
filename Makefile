@@ -12,16 +12,16 @@ LDFLAGS=-T linker.ld --oformat binary -Map=layout.map
 OBJDIR=obj
 C_SRCS= \
     krnl/kernel.c \
-	krnl/shell.c \
+    krnl/shell.c \
     krnl/io.c \
-	krnl/string.c \
-	krnl/sys/lba.c \
-	krnl/fat.c \
+    krnl/string.c \
+    krnl/sys/lba.c \
+    krnl/fat.c \
     krnl/malloc.c \
     krnl/sys/ps2.c \
-	krnl/sys/io.c \
-	krnl/sys/serial.c \
-	krnl/sys/keymap.c
+    krnl/sys/io.c \
+    krnl/sys/serial.c \
+    krnl/sys/keymap.c
 
 ASM_SRCS= \
     krnl/link.asm \
@@ -33,7 +33,7 @@ ASM_OBJS=$(patsubst %.asm,$(OBJDIR)/%.o,$(ASM_SRCS))
 OBJS=$(ASM_OBJS) $(C_OBJS)
 
 
-all: os.bin 
+all: os.bin
 
 os.bin: obj/boot obj/kernel.bin part.bin
 	@echo "OUT   $@"
@@ -67,7 +67,7 @@ debug: os.bin
 	qemu-system-i386 -m 512M -hda $< -s -S
 
 run: os.bin
-	qemu-system-i386 -m 512M -hda $< -serial stdio
+	qemu-system-i386 -m 512M -drive format=raw,file=$< -serial stdio
 
 clean:
 	rm -fr obj os.bin layout.map
