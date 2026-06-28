@@ -44,7 +44,7 @@ static void cmd_help(void) {
     setColor(GREEN);
     puts("List of initialized commands :");
     setColor(RED);
-    puts("WARNING : Commands initialize themselves by having a underscore at first!")
+    puts("WARNING : Commands initialize themselves by having a underscore at first!");
     setColor(BLUE);
     puts(" _help              Shows this message");
     puts(" _ls                List the files in the directory");
