@@ -162,7 +162,7 @@ static void execute_command(char *input) {
 void shell_init(void) {
     reset_cmd();
     setColor(CYAN);
-    printf("D$hell initialized. Begin with '_help' to understand the command usage");
+    puts("D$hell initialized. Begin with '_help' to understand the command usage");
     setColor(WHITE);
     print_prompt();
 }
