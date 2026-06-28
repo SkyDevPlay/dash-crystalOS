@@ -1,13 +1,17 @@
-# Monter part.bin et ajouter un fichier
-mkdir -p /tmp/mnt
+# 1. Monter et ajouter le fichier dans part.bin
 sudo mount -o loop part.bin /tmp/mnt
 echo "Hello CrystalOS!" | sudo tee /tmp/mnt/TEST.TXT
 sudo umount /tmp/mnt
 
-# Rebuilder os.bin (qui inclut part.bin)
+# 2. Vérifier que le fichier est bien dans part.bin
+sudo mount -o loop part.bin /tmp/mnt
+ls /tmp/mnt
+sudo umount /tmp/mnt
+
+# 3. Rebuilder os.bin pour inclure le part.bin mis à jour
 make
 
-# Relancer
+# 4. Relancer QEMU
 qemu-system-i386 -m 512M \
   -drive file=os.bin,format=raw,if=none,id=hd0 \
   -device piix3-ide,id=ide0 \
