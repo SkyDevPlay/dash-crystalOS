@@ -7,7 +7,6 @@ KERNEL_LOCATION equ 0x1000
 UPPER_MEM equ 0x802
 EXTENDED_MEM equ 0x804
 
-
 mov [BOOT_DISK], dl
 
 mov ax, 0xE801
@@ -22,14 +21,22 @@ mov ah, 0
 mov al, 0x3
 int 10h
 
-mov ah, 0x2
-mov al, 0x7F
-mov ch, 0x0
-mov dh, 0x0
-mov cl, 0x2
+mov si, booting_msg
+call print
+
+mov ax, 0x0000
+mov es, ax
 mov bx, KERNEL_LOCATION
+
+mov si, dap
+mov ah, 0x42
 mov dl, [BOOT_DISK]
 int 13h
+
+jc disk_error
+
+mov si, loaded_msg
+call print
 
 CODE_SEG equ gdt_code - gdt_start
 DATA_SEG equ gdt_data - gdt_start
@@ -42,9 +49,26 @@ mov cr0, eax
 
 jmp CODE_SEG:start_pm
 
+disk_error:
+    mov si, disk_err_msg
+    call print
+    jmp $
+
 %include "boot/fprint.asm"
 
+booting_msg db "Booting...", 0
+loaded_msg db "Kernel loaded!", 0
+disk_err_msg db "DISK ERROR", 0
 shell: db "D$>> ", 0
+
+dap:
+    db 0x10
+    db 0x00
+    dw 0x7F
+    dw KERNEL_LOCATION
+    dw 0x0000
+    dd 0x00000001
+    dd 0x00000000
 
 gdt_start:
     gdt_null:
@@ -101,6 +125,5 @@ mbr_part_3:
     dd 0, 0, 0, 0
 mbr_part_4:
     dd 0, 0, 0, 0
-    
-dw 0xAA55
 
+dw 0xAA55
