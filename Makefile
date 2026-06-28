@@ -12,6 +12,7 @@ LDFLAGS=-T linker.ld --oformat binary -Map=layout.map
 OBJDIR=obj
 C_SRCS= \
     krnl/kernel.c \
+	krnl/shell.c \
     krnl/io.c \
 	krnl/string.c \
 	krnl/sys/lba.c \
