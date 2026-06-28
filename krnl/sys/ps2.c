@@ -17,7 +17,7 @@ void init_idt() {
     IDT[0x21].offset_lower = (u32)keyboard_handler & 0xFFFF;
     IDT[0x21].offset_upper = ((u32)keyboard_handler & 0xFFFF0000) >> 16;
 
-    for(int i = 0; i < 0x16; i++) {
+    for(int i = 0; i < 0x20; i++) {
         IDT[i].segment = 8;
         IDT[i].zero = 0;
         IDT[i].type = 0b10001110;

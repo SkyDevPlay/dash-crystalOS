@@ -97,9 +97,6 @@ int main(void) {
     i = fread(buf, 1, 32, f);
     printf("%d '%s'\n", i, buf);
 
-    if(initSerial(coms[0])) {
-        printf("ERROR : Failed to initialize serial port");
-    }
 
 for (;;) {
     __asm__("hlt"); // Halt the CPU until the next interrupt

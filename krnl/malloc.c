@@ -14,7 +14,7 @@ int init_malloc(u32 mem_size){
         return -1;
     malloc_entries = (malloc_entry *)START_ADDR;
     malloc_blob = (void*)malloc_entries + sizeof(malloc_entry) * MALLOC_ENTRY_COUNT;
-    blob_size = (void*)mem_size - malloc_blob;
+    blob_size = mem_size - (u32)malloc_blob;
     printf("Malloc entries at 0x%x array at 0x%x of size %dKb\n", malloc_entries, malloc_blob, blob_size/1024);
 
     return 0;
