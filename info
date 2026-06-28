@@ -7,4 +7,8 @@ echo "Hello DashCrystalOS!" | sudo tee /tmp/mnt/HELLO.TXT
 sudo umount /tmp/mnt
 
 
-qemu-system-i386 -m 512M -machine pc -hda os.bin -serial stdio
+qemu-system-i386 -m 512M \
+  -drive file=os.bin,format=raw,if=none,id=hd0 \
+  -device piix3-ide,id=ide0 \
+  -device ide-hd,bus=ide0.0,drive=hd0 \
+  -serial stdio
