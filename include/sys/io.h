@@ -32,4 +32,5 @@ u8 readSerial(u16 port);
 void setColor(TermColor color);
 int putchar(int c);
 void backspace();
+void clearScreen(void);
 #endif

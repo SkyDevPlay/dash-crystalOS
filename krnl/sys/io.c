@@ -75,3 +75,15 @@ void backspace() {
     SCR_AT(scr_x, scr_y, 1) = PINK;
     update_cursor(scr_x, scr_y);
 }
+
+void clearScreen(void) {
+    for (int y = 0; y < SCR_HEIGHT; y++) {
+        for (int x = 0; x < SCR_WIDTH; x++) {
+            SCR_AT(x, y, 0) = ' ';
+            SCR_AT(x, y, 1) = WHITE;
+        }
+    }
+    scr_x = 0;
+    scr_y = 0;
+    update_cursor(0, 0);
+}
