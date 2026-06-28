@@ -3,5 +3,5 @@ mkfs.fat -F 16 -S 512 -s 4 -r 512 -n "DASHCRYSTALOS" part.bin
 # Monter et ajouter un fichier (Linux)
 mkdir -p /tmp/mnt
 sudo mount -o loop part.bin /tmp/mnt
-echo "Hello CrystalOS!" | sudo tee /tmp/mnt/TEST.TXT
+echo "Hello DashCrystalOS!" | sudo tee /tmp/mnt/HELLO.TXT
 sudo umount /tmp/mnt
