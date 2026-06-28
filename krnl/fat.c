@@ -3,13 +3,10 @@
 #include "io.h"
 #include "malloc.h"
 #include "string.h"
-
 #define MIN(x,y) ((x)<(y)?(x):(y))
-
-/* Adresses physiques où le bootloader a stocké les métadonnées FAT */
-#define FAT_BS_ADDR    0x9000    /* bootsector FAT                    */
-#define FAT_TABLE_ADDR 0x9200    /* FAT table (64 secteurs = 32 KB)   */
-#define FAT_ROOT_ADDR  0x11200   /* root directory (32 secteurs)      */
+#define FAT_BS_ADDR    0x9000
+#define FAT_TABLE_ADDR 0x9200
+#define FAT_ROOT_ADDR  0x11200
 
 struct fat_attr {
     u8 ReadOnly   : 1;
@@ -49,12 +46,13 @@ struct fat_dir_entry {
     u32 filesize;
 };
 
-/* Pointeurs vers les buffers chargés par le bootloader */
 static struct fat_bootsector *bs;
 static u16                   *fat;
 static struct fat_dir_entry  *root_entries;
 
 static u32 data_addr;
+static u32 fat_addr;
+static u32 root_addr;
 static u32 bytes_per_cluster;
 
 static void clean_entry(struct fat_dir_entry *entry) {
@@ -65,17 +63,15 @@ static void clean_entry(struct fat_dir_entry *entry) {
 }
 
 int init_fs(u32 start_sector) {
-    /* Les métadonnées sont déjà en RAM, chargées par le bootloader */
     bs          = (struct fat_bootsector *)FAT_BS_ADDR;
     fat         = (u16 *)FAT_TABLE_ADDR;
     root_entries = (struct fat_dir_entry *)FAT_ROOT_ADDR;
 
-    /* Vérifications de base */
     if (!bs->code_jump[0]) return -1;
     if (bs->bytes_per_sector != 512) return -2;
 
-    u32 fat_addr        = start_sector + bs->resv_sectors;
-    u32 root_addr       = fat_addr + bs->sectors_per_fat * bs->fat_count;
+    fat_addr            = start_sector + bs->resv_sectors;
+    root_addr           = fat_addr + bs->sectors_per_fat * bs->fat_count;
     data_addr           = root_addr + (bs->root_entry_count * sizeof(struct fat_dir_entry)) / 512;
     bytes_per_cluster   = bs->sectors_per_cluster * bs->bytes_per_sector;
 
@@ -83,6 +79,20 @@ int init_fs(u32 start_sector) {
         clean_entry(&root_entries[i]);
 
     return 0;
+}
+
+static void sync_fat_sector(u16 cluster) {
+    u32 byte_off   = (u32)cluster * sizeof(*fat);
+    u32 sector_off = byte_off / bs->bytes_per_sector;
+    u8 *sector_ptr = (u8 *)fat + sector_off * bs->bytes_per_sector;
+    ata_lba_write(fat_addr + sector_off, 1, sector_ptr);
+}
+
+static void sync_dir_entry(int idx) {
+    u32 byte_off   = (u32)idx * sizeof(struct fat_dir_entry);
+    u32 sector_off = byte_off / bs->bytes_per_sector;
+    u8 *sector_ptr = (u8 *)root_entries + sector_off * bs->bytes_per_sector;
+    ata_lba_write(root_addr + sector_off, 1, sector_ptr);
 }
 
 static void format_entry(struct fat_dir_entry entry, char buf[13]) {
@@ -168,9 +178,10 @@ FILE *fopen(char *path, char *mode) {
     if (idx < 0) return 0;
 
     FILE *file = malloc(sizeof(FILE));
-    file->cluster  = root_entries[idx].cluster;
-    file->filesize = root_entries[idx].filesize;
-    file->offset   = 0;
+    file->cluster   = root_entries[idx].cluster;
+    file->filesize  = root_entries[idx].filesize;
+    file->offset    = 0;
+    file->dir_index = idx;
     return file;
 }
 
@@ -252,14 +263,23 @@ u32 fwrite(void *ptr, u32 size, u32 n, FILE *stream) {
         stream->offset += r;
         offset = (offset + r) % bytes_per_cluster;
         if (fat[cur_cluster] == 0xFFFF && to_write) {
+            u16 prev = cur_cluster;
             cur_cluster = allocate_cluster(cur_cluster);
             if (!cur_cluster) break;
+            /* Persiste les deux entrées FAT modifiées (prev -> cur_cluster, et le EOF de cur_cluster) */
+            sync_fat_sector(prev);
+            sync_fat_sector(cur_cluster);
         } else {
             cur_cluster = fat[cur_cluster];
         }
     }
     free(buffer);
-    if (stream->offset > stream->filesize)
+    if (stream->offset > stream->filesize) {
         stream->filesize = stream->offset;
+        if (stream->dir_index >= 0) {
+            root_entries[stream->dir_index].filesize = stream->filesize;
+            sync_dir_entry(stream->dir_index);
+        }
+    }
     return n * size - to_write;
 }

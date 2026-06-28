@@ -8,6 +8,13 @@
 
 void _itoa(u32 value, char *buf, u32 base) {
     int idx = 0;
+
+    if (value == 0) {
+        buf[0] = '0';
+        buf[1] = '\0';
+        return;
+    }
+
     while (value > 0) {
         u8 v = value % base;
         if (v < 10) {
@@ -60,10 +67,13 @@ int printf(const char *format, ...) {
                         str = va_arg(args, char *);
                         while(*str) putchar(*str++);
                         break;
+                    case 'c':
+                        putchar(va_arg(args, int));
+                        break;
                     default:
-                        buf[0] = 'E';
-                        buf[1] = 'R';
-                        buf[2] = 'R';
+                        putchar('E');
+                        putchar('R');
+                        putchar('R');
                 }
             }
         } else {

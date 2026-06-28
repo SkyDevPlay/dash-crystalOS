@@ -1,19 +1,38 @@
 #include "sys/serial.h"
-#include "sys/ports.h" // You'll need this to use inb/outb/outw/inw
+#include "sys/io.h"
+#include "sys/ports.h"
 
-// Base port for COM1
-int coms = 0x3F8;
+u16 coms_table[4] = { 0x3F8, 0x2F8, 0x3E8, 0x2E8 };
+u16 lpts_table[3] = { 0x378, 0x278, 0x3BC };
+u16 *coms = coms_table;
+u16 *lpts = lpts_table;
 
-void initSerial(void) {
-    // Basic initialization for COM1 (often assumed to be the serial port)
-    // The implementation will depend on your specific hardware/emulation environment.
-    // This is just a placeholder to make the linker happy.
-    // Example step (using functions you hope to define for port I/O):
-    // outb(coms + 1, 0x00);    // Disable interrupts
-    // outb(coms + 3, 0x80);    // Enable DLAB (set baud rate divisor)
-    // outb(coms + 0, 0x03);    // Set divisor to 3 (38400 baud)
-    // outb(coms + 1, 0x00);
-    // outb(coms + 3, 0x03);    // Disable DLAB, Set data format (8 bits, no parity, 1 stop bit)
-    // outb(coms + 2, 0xC7);    // Enable FIFO, clear them, 14-byte threshold
-    // outb(coms + 4, 0x0B);    // IRQs enabled, RTS/DSR set
+int initSerial(u16 port) {
+    outb(port + 1, 0x00);
+    outb(port + 3, 0x80);
+    outb(port + 0, 0x03);
+    outb(port + 1, 0x00);
+    outb(port + 3, 0x03);
+    outb(port + 2, 0xC7);
+    outb(port + 4, 0x0B);
+    outb(port + 4, 0x1E);
+    outb(port + 0, 0xAE);
+
+    if (inb(port + 0) != 0xAE) return -1;
+    outb(port + 4, 0x0F);
+    return 0;
+}
+
+void writeSerial(u16 port, u8 c) {
+    while (!(inb(port + 5) & 0x20));
+    outb(port, c);
+}
+
+u8 readSerial(u16 port) {
+    while (!(inb(port + 5) & 0x01));
+    return inb(port);
+}
+
+void serialString(u16 port, char *str) {
+    while (*str) writeSerial(port, (u8)*str++);
 }

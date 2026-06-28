@@ -5,16 +5,9 @@ BOOT_DISK        equ 0x800
 KERNEL_LOCATION  equ 0x1000
 UPPER_MEM        equ 0x802
 EXTENDED_MEM     equ 0x804
-
-; Adresses physiques pour les métadonnées FAT
-; 0x9000 = bootsector FAT (segment 0x0900, offset 0x0000)
-; 0x9200 = FAT table     (segment 0x0920, offset 0x0000)  
-; 0x11200 = root dir     (segment 0x1120, offset 0x0000)
-FAT_BS_SEG       equ 0x0900   ; bootsector FAT à 0x9000
-FAT_TABLE_SEG    equ 0x0920   ; FAT table à 0x9200
-FAT_ROOT_SEG     equ 0x1120   ; root dir à 0x11200
-
-; LBA de la partition (doit correspondre à mbr_part_1.lba_start)
+FAT_BS_SEG       equ 0x0900
+FAT_TABLE_SEG    equ 0x0920
+FAT_ROOT_SEG     equ 0x1120
 PART_LBA         equ 2048
 
 mov [BOOT_DISK], dl
@@ -34,7 +27,6 @@ int 10h
 mov si, booting_msg
 call print
 
-; --- Charger le kernel (32 secteurs depuis LBA 1) ---
 mov ax, 0x0000
 mov es, ax
 mov bx, KERNEL_LOCATION
@@ -51,7 +43,6 @@ jc disk_error
 mov si, loaded_msg
 call print
 
-; --- Vérifier support INT 13h Extended ---
 mov ah, 0x41
 mov bx, 0x55AA
 mov dl, 0x80
@@ -66,7 +57,6 @@ jmp .has_ext
     jmp $
 .has_ext:
 
-; --- Charger bootsector FAT (1 secteur, LBA 2048) ---
 mov ax, FAT_BS_SEG
 mov es, ax
 mov word [dap.count],   1
@@ -80,12 +70,10 @@ mov si, dap
 int 13h
 jc disk_error
 
-; --- Charger FAT table (64 secteurs, LBA 2049) ---
-; 64 secteurs * 512 = 32768 bytes -> segment 0x0920, offset 0
 mov word [dap.count],   64
 mov word [dap.offset],  0
 mov word [dap.segment], FAT_TABLE_SEG
-mov dword [dap.lba_lo], PART_LBA + 1
+mov dword [dap.lba_lo], PART_LBA + 4
 mov dword [dap.lba_hi], 0
 mov ah, 0x42
 mov dl, 0x80
@@ -93,12 +81,10 @@ mov si, dap
 int 13h
 jc disk_error
 
-; --- Charger root directory (32 secteurs, LBA 2177) ---
-; LBA 2048 + 1(resv) + 64(fat1) + 64(fat2) = 2177
 mov word [dap.count],   32
 mov word [dap.offset],  0
 mov word [dap.segment], FAT_ROOT_SEG
-mov dword [dap.lba_lo], PART_LBA + 1 + 128
+mov dword [dap.lba_lo], PART_LBA + 4 + 128
 mov dword [dap.lba_hi], 0
 mov ah, 0x42
 mov dl, 0x80
@@ -109,7 +95,7 @@ jc disk_error
 mov si, fs_loaded_msg
 call print
 
-; --- Passer en mode protégé ---
+
 CODE_SEG equ gdt_code - gdt_start
 DATA_SEG equ gdt_data - gdt_start
 
@@ -136,20 +122,19 @@ disk_error:
     call print
     jmp $
 
-; DAP (Disk Address Packet) pour INT 13h Extended
 dap:
-    db 0x10          ; taille du DAP
-    db 0x00          ; réservé
+    db 0x10
+    db 0x00
 .count:
-    dw 0             ; nombre de secteurs
+    dw 0
 .offset:
-    dw 0             ; offset destination
+    dw 0
 .segment:
-    dw 0             ; segment destination
+    dw 0
 .lba_lo:
-    dd 0             ; LBA bas 32 bits
+    dd 0
 .lba_hi:
-    dd 0             ; LBA haut 32 bits
+    dd 0
 
 %include "boot/fprint.asm"
 

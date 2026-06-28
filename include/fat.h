@@ -3,9 +3,7 @@
 
 #include "types.h"
 
-typedef enum{
-    disk = 0xF8
-} MediaDescriptor;
+#define MEDIA_DESCRIPTOR_DISK 0xF8
 
 struct __attribute__((packed)) fat_bootsector {
     u8 code_jump[3];
@@ -16,7 +14,7 @@ struct __attribute__((packed)) fat_bootsector {
     u8 fat_count;
     u16 root_entry_count;
     u16 smol_sector_count;
-    MediaDescriptor media_descriptor;
+    u8 media_descriptor;
     u16 sectors_per_fat;
     u16 sectors_per_track;
     u16 head_count;
@@ -36,6 +34,7 @@ typedef struct FILE {
     u16 cluster;
     u32 filesize;
     u32 offset;
+    int dir_index;
 } FILE;
 
 enum {
