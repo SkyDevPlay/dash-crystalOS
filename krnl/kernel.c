@@ -59,7 +59,11 @@ int main(void) {
 
     if (init_fs(mbr->parts[0].lba_start) < 0) {
         setColor(RED);
-        printf("WARNING FATsystem unmounted(lba=%d)\n", mbr->parts[0].lba_start);
+        printf("FS failed\n");
+        setColor(WHITE);
+    } else {
+        setColor(GREEN);
+        printf("FS OK!\n");
         setColor(WHITE);
     }
 
