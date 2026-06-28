@@ -36,7 +36,7 @@ void handle_keyboard() {
         else if(keycode == ENTER) {
             putchar('\n');
             cmd_len = 0;
-            printf("Unknown command '%s' (ono)\n", cmd);
+            printf("Unknown command '%s'.\n", cmd);
             for(int i = 0; i < MAX_CMD; i++) cmd[i] = 0;
         }
         else if (keycode < 128) {
@@ -71,7 +71,7 @@ int main(void) {
     }
 
     setColor(CYAN);
-    puts("\n D$-Shell Launch Initialized!\n D$>> Launching...");
+    puts("\n D$-Shell Launch Initialized!\n Kernel loaded...\nD$>> ");
 
     if (init_fs(mbr->parts[0].lba_start) < 0) {
         setColor(RED);
@@ -99,6 +99,6 @@ int main(void) {
 
 
 for (;;) {
-    __asm__("hlt"); // Halt the CPU until the next interrupt
+    __asm__("hlt");
 }
 }

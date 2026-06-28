@@ -28,9 +28,12 @@ mov ax, 0x0000
 mov es, ax
 mov bx, KERNEL_LOCATION
 
-mov si, dap
-mov ah, 0x42
-mov dl, [BOOT_DISK]
+mov ah, 0x02
+mov al, 0x20
+mov ch, 0x00
+mov cl, 0x02
+mov dh, 0x00
+mov dl, 0x80
 int 13h
 
 jc disk_error
@@ -50,6 +53,18 @@ mov cr0, eax
 jmp CODE_SEG:start_pm
 
 disk_error:
+    mov al, ah
+    shr al, 4
+    add al, '0'
+    cmp al, '9'
+    jle .low
+    add al, 7
+.low:
+    mov ah, 0x0E
+    mov bh, 0
+    int 10h
+
+    mov al, [esp]
     mov si, disk_err_msg
     call print
     jmp $
@@ -60,15 +75,6 @@ booting_msg db "Booting...", 0
 loaded_msg db "Kernel loaded!", 0
 disk_err_msg db "DISK ERROR", 0
 shell: db "D$>> ", 0
-
-dap:
-    db 0x10
-    db 0x00
-    dw 0x7F
-    dw KERNEL_LOCATION
-    dw 0x0000
-    dd 0x00000001
-    dd 0x00000000
 
 gdt_start:
     gdt_null:

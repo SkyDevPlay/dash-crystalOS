@@ -104,9 +104,8 @@ Linker script and memory map
 
 .rodata         0x000000000000310c      0x16a
  *(.rodata)
- .rodata        0x000000000000310c       0xe5 obj/krnl/kernel.o
- .rodata        0x00000000000031f1       0x3a obj/krnl/fat.o
- *fill*         0x000000000000322b        0x1 
+ .rodata        0x000000000000310c       0xe6 obj/krnl/kernel.o
+ .rodata        0x00000000000031f2       0x3a obj/krnl/fat.o
  .rodata        0x000000000000322c       0x33 obj/krnl/malloc.o
  .rodata        0x000000000000325f       0x17 obj/krnl/sys/ps2.o
 
