@@ -266,7 +266,6 @@ u32 fwrite(void *ptr, u32 size, u32 n, FILE *stream) {
             u16 prev = cur_cluster;
             cur_cluster = allocate_cluster(cur_cluster);
             if (!cur_cluster) break;
-            /* Persiste les deux entrées FAT modifiées (prev -> cur_cluster, et le EOF de cur_cluster) */
             sync_fat_sector(prev);
             sync_fat_sector(cur_cluster);
         } else {
