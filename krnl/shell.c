@@ -164,12 +164,6 @@ void shell_init(void) {
     setColor(CYAN);
     puts("D$-Shell initialized. Begin with '_help' to understand the command usage");
     setColor(WHITE);
-    putchar('S');
-    putchar('H');
-    putchar('E');
-    putchar('L');
-    putchar('L');
-    putchar('\n');
     print_prompt();
 }
 
