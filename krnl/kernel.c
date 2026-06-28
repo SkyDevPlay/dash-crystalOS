@@ -55,6 +55,9 @@ int main(void) {
         printf("Serial port failed to initialize\n");
     }
 
+    printf("lba_start = %d\n", mbr->parts[0].lba_start);
+    putchar('A'); putchar('\n');
+
     if (init_fs(mbr->parts[0].lba_start) < 0) {
         setColor(RED);
         printf("WARNING FATsystem unmounted(lba=%d)\n", mbr->parts[0].lba_start);
