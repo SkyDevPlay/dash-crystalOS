@@ -2,103 +2,76 @@
 #include "sys/ps2.h"
 #include "sys/ports.h"
 #include "sys/keymap.h"
-#include "malloc.h"
 #include "sys/io.h"
-#include "io.h"
 #include "sys/lba.h"
+#include "malloc.h"
+#include "io.h"
 #include "mbr.h"
 #include "fat.h"
-#include "string.h"
+#include "shell.h"
 
 struct mbr *mbr = (void *)0x7c00;
 
-#define MAX_CMD 1024
-
-#define KB_DATA 0x60
+#define KB_DATA    0x60
 #define KB_COMMAND 0x64
 
-int is_shift = 0;
+static int is_shift = 0;
 
-int cmd_len = 0;
-char cmd[MAX_CMD];
-
-void handle_keyboard() {
+void handle_keyboard(void) {
     u8 status = inb(KB_COMMAND);
-    if (status & 1) {
-        u8 keycode = inb(KB_DATA);
-        if(keycode == LSHIFT) is_shift = 1;
-        else if(keycode == LSHIFT+0x80) is_shift = 0;
-        else if(keycode == LMAJ) is_shift = !is_shift;
-        else if(keycode == BACKSPACE) {
-            backspace();
-            if(cmd_len) cmd[--cmd_len] = 0;    
-        }
-        else if(keycode == ENTER) {
-            putchar('\n');
-            cmd_len = 0;
-            printf("Unknown command '%s'.\n", cmd);
-            for(int i = 0; i < MAX_CMD; i++) cmd[i] = 0;
-        }
-        else if (keycode < 128) {
-            char c;
-            if(is_shift) c = keymap_maj[keycode];
-            else c = keymap[keycode];
-            putchar(c);
-            if(cmd_len < MAX_CMD-1) cmd[cmd_len++] = c;
-        }
-    }
+    if (!(status & 1)) goto eoi;
+
+    u8 keycode = inb(KB_DATA);
+
+    /* Touches de modification */
+    if      (keycode == LSHIFT)        is_shift = 1;
+    else if (keycode == LSHIFT + 0x80) is_shift = 0;
+    else if (keycode == LMAJ)          is_shift = !is_shift;
+    else
+        shell_handle_key(keycode, is_shift);
+
+eoi:
     outb(PIC1_COMMAND, 0x20);
 }
 
 int main(void) {
+
     init_idt();
     kb_init();
     enable_interrupts();
 
-    u16 low_memory = 1024;
-    u16 upper_memory = *((u16*)0x802);
-    u16 extended_memory = *((u16*)0x804);
-    u32 available_memory = 1024*(low_memory + upper_memory + extended_memory * 64);
-    printf("Memory available : %dKb\n", available_memory / 1024);
-    if(init_malloc(available_memory) < 0){
+    u16 low_memory      = 1024;
+    u16 upper_memory    = *((u16 *)0x802);
+    u16 extended_memory = *((u16 *)0x804);
+    u32 available_memory = 1024u * (low_memory + upper_memory + extended_memory * 64u);
+    printf("Memoire disponible : %d Ko\n", available_memory / 1024);
+
+    if (init_malloc(available_memory) < 0) {
         setColor(RED);
-        puts("Malloc init error");
+        puts("ERROR: init_malloc crashed");
         return 0;
     }
 
-    if(initSerial(coms[0])) {
-        printf("ERROR : Failed to initialize serial port");
+    /* 3. Port série (debug QEMU via -serial stdio) */
+    if (initSerial(coms[0])) {
+        printf("Serial port failed to initialize\n");
     }
 
-    setColor(CYAN);
-    puts("\n D$-Shell Launch Initialized!\n Kernel loaded...\nD$>> ");
-
+    /* 4. Système de fichiers FAT (partition 0) */
     if (init_fs(mbr->parts[0].lba_start) < 0) {
         setColor(RED);
-        printf("Cannot init FS\n");
+        puts("ERROR: failed to mnt FATsys");
         return 0;
     }
 
-    FILE *f = fopen("HELLO.TXT", "r");
-    if (!f) {
-        printf("Cannot open file\n");
-        return 0;
+    /* 5. Lancement du shell */
+    shell_init();
+
+    /* 6. Boucle principale — tout passe par les interruptions */
+    for (;;) {
+        __asm__("hlt");
     }
 
-    char buf[32];
-    u32 i = fread(buf, 1, 32, f);
-    printf("%d '%s'\n", i, buf);
-    memset(buf, 0, 32);
-    fseek(f, 0, SEEK_SET);
-    
-    char *nod = "Dash OS";
-    fwrite(nod, 1, strlen(nod), f);
-    fseek(f, 0, SEEK_SET);
-    i = fread(buf, 1, 32, f);
-    printf("%d '%s'\n", i, buf);
-
-
-for (;;) {
-    __asm__("hlt");
+    return 0;
 }
-}
+
