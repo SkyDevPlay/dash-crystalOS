@@ -65,7 +65,6 @@ int init_fs(u32 start_sector) {
     ata_lba_read(start_sector, 1, &bs);
     if (!bs.code_jump[0]) return -1;
     if (bs.bytes_per_sector != 512) return -2;
-
     u32 fat_addr = start_sector + bs.resv_sectors;
     fat = malloc(bs.sectors_per_fat * bs.bytes_per_sector);
     ata_lba_read(fat_addr, bs.sectors_per_fat, fat);
