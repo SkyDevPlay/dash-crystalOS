@@ -1,83 +1,97 @@
 #include "sys/lba.h"
 #include "io.h"
 
-#define ATA_PRIMARY  0x1F0
+#define ATA_DATA     0x1F0
+#define ATA_ERR      0x1F1
+#define ATA_COUNT    0x1F2
+#define ATA_LBA_LO   0x1F3
+#define ATA_LBA_MID  0x1F4
+#define ATA_LBA_HI   0x1F5
+#define ATA_DRIVE    0x1F6
+#define ATA_STATUS   0x1F7
 #define ATA_CONTROL  0x3F6
-#define ATA_STATUS   (ATA_PRIMARY + 7)
-#define ATA_DATA     (ATA_PRIMARY + 0)
 
 #define ATA_BSY  0x80
 #define ATA_DRQ  0x08
-#define ATA_ERR  0x01
+#define ATA_ERR_BIT 0x01
 
 #define ATA_TIMEOUT 1000000
 
-static void ata_reset(void) {
-    outb(ATA_CONTROL, 0x04);
-    for (int i = 0; i < 10000; i++) inb(ATA_CONTROL);
-    outb(ATA_CONTROL, 0x00);
-    for (int i = 0; i < 10000; i++) inb(ATA_CONTROL);
+static void ata_400ns(void) {
+    inb(ATA_CONTROL);
+    inb(ATA_CONTROL);
+    inb(ATA_CONTROL);
+    inb(ATA_CONTROL);
 }
 
-static u8 ata_wait_bsy(void) {
+static int ata_wait_bsy(void) {
     for (int i = 0; i < ATA_TIMEOUT; i++) {
         u8 st = inb(ATA_STATUS);
-        if (st == 0xFF) continue;
-        if (!(st & ATA_BSY)) return st;
+        if (!(st & ATA_BSY)) return 0;
     }
-    return 0xFF;
+    return -1;
 }
 
-static u8 ata_wait_drq(void) {
+static int ata_wait_drq(void) {
     for (int i = 0; i < ATA_TIMEOUT; i++) {
         u8 st = inb(ATA_STATUS);
-        if (st == 0xFF) continue;
-        if (st & ATA_ERR) return 0xFF;
-        if (!(st & ATA_BSY) && (st & ATA_DRQ)) return st;
+        if (st & ATA_ERR_BIT) return -1;
+        if ((st & ATA_DRQ) && !(st & ATA_BSY)) return 0;
     }
-    return 0xFF;
+    return -1;
+}
+
+static void ata_select_master(void) {
+    outb(ATA_DRIVE, 0xA0);
+    ata_400ns();
 }
 
 void ata_lba_read(u32 sector, u8 count, void *buf) {
-    ata_reset();
-    if (ata_wait_bsy() == 0xFF) return;
+    ata_select_master();
+    if (ata_wait_bsy() < 0) return;
 
-    outb(ATA_PRIMARY + 6, 0xE0 | ((sector >> 24) & 0x0F));
-    for (int i = 0; i < 1000; i++) inb(ATA_STATUS);
+    outb(ATA_DRIVE,  0xE0 | ((sector >> 24) & 0x0F));
+    ata_400ns();
+    if (ata_wait_bsy() < 0) return;
 
-    outb(ATA_PRIMARY + 1, 0x00);
-    outb(ATA_PRIMARY + 2, count);
-    outb(ATA_PRIMARY + 3,  sector        & 0xFF);
-    outb(ATA_PRIMARY + 4, (sector >>  8) & 0xFF);
-    outb(ATA_PRIMARY + 5, (sector >> 16) & 0xFF);
-    outb(ATA_PRIMARY + 6, 0xE0 | ((sector >> 24) & 0x0F));
-    outb(ATA_PRIMARY + 7, 0x20);
+    outb(ATA_ERR,    0x00);
+    outb(ATA_COUNT,  count);
+    outb(ATA_LBA_LO, (sector)       & 0xFF);
+    outb(ATA_LBA_MID,(sector >> 8)  & 0xFF);
+    outb(ATA_LBA_HI, (sector >> 16) & 0xFF);
+    outb(ATA_DRIVE,  0xE0 | ((sector >> 24) & 0x0F));
+    outb(ATA_STATUS, 0x20);
 
     for (int a = 0; a < count; a++) {
-        if (ata_wait_drq() == 0xFF) return;
-        for (char *end = (char*)buf + 512; buf != (void*)end; buf += 2)
-            *(u16*)buf = inw(ATA_DATA);
+        if (ata_wait_drq() < 0) return;
+        u16 *p = (u16*)buf;
+        for (int i = 0; i < 256; i++)
+            p[i] = inw(ATA_DATA);
+        buf = (u8*)buf + 512;
     }
 }
 
 void ata_lba_write(u32 sector, u8 count, void *buf) {
-    ata_reset();
-    if (ata_wait_bsy() == 0xFF) return;
+    ata_select_master();
+    if (ata_wait_bsy() < 0) return;
 
-    outb(ATA_PRIMARY + 6, 0xE0 | ((sector >> 24) & 0x0F));
-    for (int i = 0; i < 1000; i++) inb(ATA_STATUS);
+    outb(ATA_DRIVE,  0xE0 | ((sector >> 24) & 0x0F));
+    ata_400ns();
+    if (ata_wait_bsy() < 0) return;
 
-    outb(ATA_PRIMARY + 1, 0x00);
-    outb(ATA_PRIMARY + 2, count);
-    outb(ATA_PRIMARY + 3,  sector        & 0xFF);
-    outb(ATA_PRIMARY + 4, (sector >>  8) & 0xFF);
-    outb(ATA_PRIMARY + 5, (sector >> 16) & 0xFF);
-    outb(ATA_PRIMARY + 6, 0xE0 | ((sector >> 24) & 0x0F));
-    outb(ATA_PRIMARY + 7, 0x30);
+    outb(ATA_ERR,    0x00);
+    outb(ATA_COUNT,  count);
+    outb(ATA_LBA_LO, (sector)       & 0xFF);
+    outb(ATA_LBA_MID,(sector >> 8)  & 0xFF);
+    outb(ATA_LBA_HI, (sector >> 16) & 0xFF);
+    outb(ATA_DRIVE,  0xE0 | ((sector >> 24) & 0x0F));
+    outb(ATA_STATUS, 0x30);
 
     for (int a = 0; a < count; a++) {
-        if (ata_wait_drq() == 0xFF) return;
-        for (char *end = (char*)buf + 512; buf != (void*)end; buf += 2)
-            outw(ATA_DATA, *(u16*)buf);
+        if (ata_wait_drq() < 0) return;
+        u16 *p = (u16*)buf;
+        for (int i = 0; i < 256; i++)
+            outw(ATA_DATA, p[i]);
+        buf = (u8*)buf + 512;
     }
 }
