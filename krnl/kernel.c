@@ -57,6 +57,14 @@ int main(void) {
 
     printf("lba_start = %d\n", mbr->parts[0].lba_start);
 
+// Dans kernel.c, avant init_fs() :
+u8 sector_buf[512];
+ata_lba_read(mbr->parts[0].lba_start, 1, sector_buf);
+printf("bootsector[0]=%x [1]=%x [2]=%x\n", 
+       sector_buf[0], sector_buf[1], sector_buf[2]);
+printf("bytes_per_sector=%d\n", 
+       *((u16*)(sector_buf + 11)));
+
     if (init_fs(mbr->parts[0].lba_start) < 0) {
         setColor(RED);
         printf("FS failed\n");
