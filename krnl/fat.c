@@ -60,28 +60,47 @@ void clean_entry(struct fat_dir_entry *entry) {
         if (entry->filename[i] == ' ') entry->filename[i] = 0;
     for (int i = 0; i < 3; i++)
         if (entry->extension[i] == ' ') entry->extension[i] = 0;
-}
-
+}
 int init_fs(u32 start_sector) {
+    putchar('1'); putchar('\n');   // debug
     ata_lba_read(start_sector, 1, &bs);
+    
+    putchar('2'); putchar('\n');   // debug
+    printf("jump=%d bps=%d spf=%d fatcnt=%d rec=%d spc=%d\n",
+        bs.code_jump[0],
+        bs.bytes_per_sector,
+        bs.sectors_per_fat,
+        bs.fat_count,
+        bs.root_entry_count,
+        bs.sectors_per_cluster);
+
     if (!bs.code_jump[0]) return -1;
     if (bs.bytes_per_sector != 512) return -2;
 
+    putchar('3'); putchar('\n');   // debug
     u32 fat_addr = start_sector + bs.resv_sectors;
     fat = malloc(bs.sectors_per_fat * bs.bytes_per_sector);
+    
+    putchar('4'); putchar('\n');   // debug
     ata_lba_read(fat_addr, bs.sectors_per_fat, fat);
 
+    putchar('5'); putchar('\n');   // debug
     u32 root_entries_addr = fat_addr + bs.sectors_per_fat * bs.fat_count;
     root_entries = malloc(bs.root_entry_count * sizeof(struct fat_dir_entry));
-    ata_lba_read(root_entries_addr, (bs.root_entry_count * sizeof(struct fat_dir_entry))/512, root_entries);
+    
+    putchar('6'); putchar('\n');   // debug
+    ata_lba_read(root_entries_addr,
+        (bs.root_entry_count * sizeof(struct fat_dir_entry)) / 512,
+        root_entries);
 
-    data_addr = root_entries_addr + (bs.root_entry_count * sizeof(struct fat_dir_entry))/512;
+    putchar('7'); putchar('\n');   // debug
+    data_addr = root_entries_addr + (bs.root_entry_count * sizeof(struct fat_dir_entry)) / 512;
     bytes_per_cluster = bs.sectors_per_cluster * bs.bytes_per_sector;
     for (int i = 0; i < bs.root_entry_count; i++) clean_entry(&root_entries[i]);
 
+    putchar('8'); putchar('\n');   // debug
     return 0;
 }
-
 
 void format_entry(struct fat_dir_entry entry, char buf[13]) {
     memset(buf, 0, 13);
