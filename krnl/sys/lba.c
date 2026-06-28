@@ -9,7 +9,7 @@
 #define ATA_DRQ  0x08
 #define ATA_ERR  0x01
 
-#define ATA_TIMEOUT 100000
+#define ATA_TIMEOUT 1000000
 
 static u8 ata_wait_bsy(void) {
     for (int i = 0; i < ATA_TIMEOUT; i++) {
