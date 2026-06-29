@@ -56,7 +56,8 @@ static void cmd_help(void) {
 }
 /* _ver */
 static void cmd_ver(void) {
-    setColor(CYAN);  
+    setColor(DARK_CYAN);
+    puts("/-    Da$h Crystal OS version 1.1     -\ ");  
     setColor(WHITE);
 }
 
