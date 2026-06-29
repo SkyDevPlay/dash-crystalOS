@@ -31,3 +31,105 @@ int_handler:
     popad
     iretd
     ret
+
+isr_common_handler:
+    pushad
+    push esp
+    call isr_handle
+    add esp, 4
+    add esp, 8
+    popad
+    iretd
+
+isr0:
+    push 0
+    push 0
+    jmp isr_common_handler
+
+isr1:
+    push 1
+    push 1
+    jmp isr_common_handler
+
+isr2:
+    push 2
+    push 2
+    jmp isr_common_handler
+
+isr3:
+    push 3
+    push 3
+    jmp isr_common_handler
+
+isr4:
+    push 4
+    push 4
+    jmp isr_common_handler
+
+isr5:
+    push 5
+    push 5
+    jmp isr_common_handler
+
+isr6:
+    push 6
+    push 6
+    jmp isr_common_handler
+
+isr7:
+    push 7
+    push 7
+    jmp isr_common_handler
+
+isr8:
+    push 8
+    jmp isr_common_handler
+
+isr9:
+    push 9
+    push 9
+    jmp isr_common_handler
+
+isr10:
+    push 10
+    jmp isr_common_handler
+
+isr11:
+    push 11
+    jmp isr_common_handler
+
+isr12:
+    push 12
+    jmp isr_common_handler
+
+isr13:
+    push 13
+    jmp isr_common_handler
+
+isr14:
+    push 14
+    jmp isr_common_handler
+
+isr15:
+    push 15
+    push 15
+    jmp isr_common_handler
+
+isr16:
+    push 16
+    push 16
+    jmp isr_common_handler
+
+isr17:
+    push 17
+    jmp isr_common_handler
+ 
+ isr18:
+    push 18
+    push 18
+    jmp isr_common_handler
+
+isr19:
+    push 19
+    push 19
+    jmp isr_common_handler
