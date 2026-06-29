@@ -48,10 +48,16 @@ static void cmd_help(void) {
     setColor(BLUE);
     puts(" _help              Shows this message");
     puts(" _ls                List the files in the directory");
+    puts(" _var               Information about Dash Crystal OS version");
     puts(" _sw <file>         Shows the content of a file");
     puts(" _wrt <file> <txt>  Write text in a file");
     puts(" _echo <texte>      Puts text on screen");
     puts(" _clr               Clear the screen");
+}
+/* _ver */
+static void cmd_ver(void) {
+    setColor(CYAN);  
+    setColor(WHITE);
 }
 
 /* _ls */
@@ -148,6 +154,7 @@ static void execute_command(char *input) {
 
     if      (strcmp(argv[0], "_help")  == 0) cmd_help();
     else if (strcmp(argv[0], "_ls")    == 0) cmd_ls();
+    else if (strcmp(argv[0], "_ver")    == 0) cmd_ver();
     else if (strcmp(argv[0], "_sw")   == 0) cmd_sw(argc, argv);
     else if (strcmp(argv[0], "_wrt") == 0) cmd_wrt(argc, argv);
     else if (strcmp(argv[0], "_echo")  == 0) cmd_echo(argc, argv);

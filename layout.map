@@ -8,7 +8,7 @@ Linker script and memory map
 
                 0x0000000000001000                . = 0x1000
 
-.text           0x0000000000001000     0x2ab4
+.text           0x0000000000001000     0x2b69
  *(.text)
  .text          0x0000000000001000       0x1c obj/krnl/link.o
                 0x0000000000001000                _start
@@ -29,120 +29,120 @@ Linker script and memory map
  .text          0x0000000000001074      0x20c obj/krnl/kernel.o
                 0x0000000000001074                handle_keyboard
                 0x000000000000110f                main
- .text          0x0000000000001280      0x718 obj/krnl/shell.o
-                0x000000000000186d                shell_init
-                0x00000000000018aa                shell_handle_key
- .text          0x0000000000001998      0x324 obj/krnl/io.o
-                0x0000000000001998                _itoa
-                0x0000000000001a7d                printf
-                0x0000000000001c7b                puts
- .text          0x0000000000001cbc      0x2df obj/krnl/string.o
-                0x0000000000001cbc                memset
-                0x0000000000001cf6                memcpy
-                0x0000000000001d15                mempcpy
-                0x0000000000001d5b                stpcpy
-                0x0000000000001d8f                strcpy
-                0x0000000000001dab                strcat
-                0x0000000000001dd8                strcmp
-                0x0000000000001e28                stpncpy
-                0x0000000000001e73                strncpy
-                0x0000000000001e92                strncat
-                0x0000000000001ebf                strncmp
-                0x0000000000001f19                strchr
-                0x0000000000001f56                strlen
-                0x0000000000001f7a                strnlen
- .text          0x0000000000001f9b      0x3b2 obj/krnl/sys/lba.o
-                0x00000000000020b0                ata_lba_read
-                0x00000000000021ff                ata_lba_write
- .text          0x000000000000234d      0xd24 obj/krnl/fat.o
-                0x00000000000023b7                init_fs
-                0x00000000000025ef                read_file
-                0x00000000000028f4                list_dir
-                0x0000000000002a37                fopen
-                0x0000000000002bc9                fread
-                0x0000000000002d41                fseek
-                0x0000000000002d9d                fclose
-                0x0000000000002e38                fwrite
- .text          0x0000000000003071      0x325 obj/krnl/malloc.o
-                0x0000000000003071                init_malloc
-                0x00000000000030dd                find_empty_entry
-                0x0000000000003118                find_entry
-                0x0000000000003154                realloc
-                0x00000000000031f1                find_up_nearest
-                0x0000000000003269                malloc
-                0x0000000000003331                free
- .text          0x0000000000003396      0x192 obj/krnl/sys/ps2.o
-                0x0000000000003396                int_handle
-                0x00000000000033af                init_idt
-                0x000000000000350d                kb_init
- .text          0x0000000000003528      0x3a7 obj/krnl/sys/io.o
-                0x0000000000003528                swipeTerm
-                0x0000000000003611                update_cursor
-                0x000000000000368c                newLine
-                0x00000000000036e0                setColor
-                0x00000000000036ee                putchar
-                0x0000000000003798                backspace
-                0x000000000000383e                clearScreen
- .text          0x00000000000038cf      0x1e5 obj/krnl/sys/serial.o
-                0x00000000000038cf                initSerial
-                0x00000000000039eb                writeSerial
-                0x0000000000003a37                readSerial
-                0x0000000000003a77                serialString
- .text          0x0000000000003ab4        0x0 obj/krnl/sys/keymap.o
+ .text          0x0000000000001280      0x7cd obj/krnl/shell.o
+                0x0000000000001922                shell_init
+                0x000000000000195f                shell_handle_key
+ .text          0x0000000000001a4d      0x324 obj/krnl/io.o
+                0x0000000000001a4d                _itoa
+                0x0000000000001b32                printf
+                0x0000000000001d30                puts
+ .text          0x0000000000001d71      0x2df obj/krnl/string.o
+                0x0000000000001d71                memset
+                0x0000000000001dab                memcpy
+                0x0000000000001dca                mempcpy
+                0x0000000000001e10                stpcpy
+                0x0000000000001e44                strcpy
+                0x0000000000001e60                strcat
+                0x0000000000001e8d                strcmp
+                0x0000000000001edd                stpncpy
+                0x0000000000001f28                strncpy
+                0x0000000000001f47                strncat
+                0x0000000000001f74                strncmp
+                0x0000000000001fce                strchr
+                0x000000000000200b                strlen
+                0x000000000000202f                strnlen
+ .text          0x0000000000002050      0x3b2 obj/krnl/sys/lba.o
+                0x0000000000002165                ata_lba_read
+                0x00000000000022b4                ata_lba_write
+ .text          0x0000000000002402      0xd24 obj/krnl/fat.o
+                0x000000000000246c                init_fs
+                0x00000000000026a4                read_file
+                0x00000000000029a9                list_dir
+                0x0000000000002aec                fopen
+                0x0000000000002c7e                fread
+                0x0000000000002df6                fseek
+                0x0000000000002e52                fclose
+                0x0000000000002eed                fwrite
+ .text          0x0000000000003126      0x325 obj/krnl/malloc.o
+                0x0000000000003126                init_malloc
+                0x0000000000003192                find_empty_entry
+                0x00000000000031cd                find_entry
+                0x0000000000003209                realloc
+                0x00000000000032a6                find_up_nearest
+                0x000000000000331e                malloc
+                0x00000000000033e6                free
+ .text          0x000000000000344b      0x192 obj/krnl/sys/ps2.o
+                0x000000000000344b                int_handle
+                0x0000000000003464                init_idt
+                0x00000000000035c2                kb_init
+ .text          0x00000000000035dd      0x3a7 obj/krnl/sys/io.o
+                0x00000000000035dd                swipeTerm
+                0x00000000000036c6                update_cursor
+                0x0000000000003741                newLine
+                0x0000000000003795                setColor
+                0x00000000000037a3                putchar
+                0x000000000000384d                backspace
+                0x00000000000038f3                clearScreen
+ .text          0x0000000000003984      0x1e5 obj/krnl/sys/serial.o
+                0x0000000000003984                initSerial
+                0x0000000000003aa0                writeSerial
+                0x0000000000003aec                readSerial
+                0x0000000000003b2c                serialString
+ .text          0x0000000000003b69        0x0 obj/krnl/sys/keymap.o
 
-.data           0x0000000000003ac0      0x120
+.data           0x0000000000003b80      0x120
  *(.data)
- .data          0x0000000000003ac0        0x4 obj/krnl/kernel.o
-                0x0000000000003ac0                mbr
- .data          0x0000000000003ac4        0x0 obj/krnl/shell.o
- .data          0x0000000000003ac4        0x0 obj/krnl/io.o
- .data          0x0000000000003ac4        0x0 obj/krnl/string.o
- .data          0x0000000000003ac4        0x0 obj/krnl/sys/lba.o
- .data          0x0000000000003ac4        0x0 obj/krnl/fat.o
- .data          0x0000000000003ac4        0x0 obj/krnl/malloc.o
- .data          0x0000000000003ac4        0x0 obj/krnl/sys/ps2.o
- .data          0x0000000000003ac4        0x4 obj/krnl/sys/io.o
-                0x0000000000003ac4                color
- .data          0x0000000000003ac8       0x18 obj/krnl/sys/serial.o
-                0x0000000000003ac8                coms_table
-                0x0000000000003ad0                lpts_table
-                0x0000000000003ad8                coms
-                0x0000000000003adc                lpts
- .data          0x0000000000003ae0      0x100 obj/krnl/sys/keymap.o
-                0x0000000000003ae0                keymap
-                0x0000000000003b60                keymap_maj
+ .data          0x0000000000003b80        0x4 obj/krnl/kernel.o
+                0x0000000000003b80                mbr
+ .data          0x0000000000003b84        0x0 obj/krnl/shell.o
+ .data          0x0000000000003b84        0x0 obj/krnl/io.o
+ .data          0x0000000000003b84        0x0 obj/krnl/string.o
+ .data          0x0000000000003b84        0x0 obj/krnl/sys/lba.o
+ .data          0x0000000000003b84        0x0 obj/krnl/fat.o
+ .data          0x0000000000003b84        0x0 obj/krnl/malloc.o
+ .data          0x0000000000003b84        0x0 obj/krnl/sys/ps2.o
+ .data          0x0000000000003b84        0x4 obj/krnl/sys/io.o
+                0x0000000000003b84                color
+ .data          0x0000000000003b88       0x18 obj/krnl/sys/serial.o
+                0x0000000000003b88                coms_table
+                0x0000000000003b90                lpts_table
+                0x0000000000003b98                coms
+                0x0000000000003b9c                lpts
+ .data          0x0000000000003ba0      0x100 obj/krnl/sys/keymap.o
+                0x0000000000003ba0                keymap
+                0x0000000000003c20                keymap_maj
 
-.rodata         0x0000000000003be0      0x386
+.rodata         0x0000000000003ca0      0x56e
  *(.rodata)
- .rodata        0x0000000000003be0       0x7d obj/krnl/kernel.o
- *fill*         0x0000000000003c5d        0x3 
- .rodata        0x0000000000003c60      0x281 obj/krnl/shell.o
- .rodata        0x0000000000003ee1       0x3a obj/krnl/fat.o
- *fill*         0x0000000000003f1b        0x1 
- .rodata        0x0000000000003f1c       0x33 obj/krnl/malloc.o
- .rodata        0x0000000000003f4f       0x17 obj/krnl/sys/ps2.o
+ .rodata        0x0000000000003ca0       0x7d obj/krnl/kernel.o
+ *fill*         0x0000000000003d1d        0x3 
+ .rodata        0x0000000000003d20      0x469 obj/krnl/shell.o
+ .rodata        0x0000000000004189       0x3a obj/krnl/fat.o
+ *fill*         0x00000000000041c3        0x1 
+ .rodata        0x00000000000041c4       0x33 obj/krnl/malloc.o
+ .rodata        0x00000000000041f7       0x17 obj/krnl/sys/ps2.o
 
-.bss            0x0000000000003f80     0x1088
+.bss            0x0000000000004220     0x1088
  *(.bss)
- .bss           0x0000000000003f80        0x4 obj/krnl/kernel.o
- *fill*         0x0000000000003f84       0x1c 
- .bss           0x0000000000003fa0      0x820 obj/krnl/shell.o
- .bss           0x00000000000047c0        0x0 obj/krnl/io.o
- .bss           0x00000000000047c0        0x0 obj/krnl/string.o
- .bss           0x00000000000047c0        0x0 obj/krnl/sys/lba.o
- .bss           0x00000000000047c0       0x1c obj/krnl/fat.o
- .bss           0x00000000000047dc        0xc obj/krnl/malloc.o
-                0x00000000000047dc                blob_size
-                0x00000000000047e0                malloc_entries
-                0x00000000000047e4                malloc_blob
- *fill*         0x00000000000047e8       0x18 
- .bss           0x0000000000004800      0x800 obj/krnl/sys/ps2.o
-                0x0000000000004800                IDT
- .bss           0x0000000000005000        0x8 obj/krnl/sys/io.o
-                0x0000000000005000                scr_x
-                0x0000000000005004                scr_y
- .bss           0x0000000000005008        0x0 obj/krnl/sys/serial.o
- .bss           0x0000000000005008        0x0 obj/krnl/sys/keymap.o
+ .bss           0x0000000000004220        0x4 obj/krnl/kernel.o
+ *fill*         0x0000000000004224       0x1c 
+ .bss           0x0000000000004240      0x820 obj/krnl/shell.o
+ .bss           0x0000000000004a60        0x0 obj/krnl/io.o
+ .bss           0x0000000000004a60        0x0 obj/krnl/string.o
+ .bss           0x0000000000004a60        0x0 obj/krnl/sys/lba.o
+ .bss           0x0000000000004a60       0x1c obj/krnl/fat.o
+ .bss           0x0000000000004a7c        0xc obj/krnl/malloc.o
+                0x0000000000004a7c                blob_size
+                0x0000000000004a80                malloc_entries
+                0x0000000000004a84                malloc_blob
+ *fill*         0x0000000000004a88       0x18 
+ .bss           0x0000000000004aa0      0x800 obj/krnl/sys/ps2.o
+                0x0000000000004aa0                IDT
+ .bss           0x00000000000052a0        0x8 obj/krnl/sys/io.o
+                0x00000000000052a0                scr_x
+                0x00000000000052a4                scr_y
+ .bss           0x00000000000052a8        0x0 obj/krnl/sys/serial.o
+ .bss           0x00000000000052a8        0x0 obj/krnl/sys/keymap.o
 LOAD obj/krnl/link.o
 LOAD obj/krnl/sys/pic.o
 LOAD obj/krnl/sys/ports.o
