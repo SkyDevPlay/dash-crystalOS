@@ -8,6 +8,27 @@ global enable_interrupts
 global keyboard_handler
 global int_handler
 
+global isr0
+global isr1
+global isr2
+global isr3
+global isr4
+global isr5
+global isr6
+global isr7
+global isr8
+global isr9
+global isr10
+global isr11
+global isr12
+global isr13
+global isr14
+global isr15
+global isr16
+global isr17
+global isr18
+global isr19
+
 load_idt:
     mov edx, [esp + 4]
     lidt [edx]
