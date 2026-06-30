@@ -1,19 +1,8 @@
-# 1. Monter et ajouter le fichier dans part.bin
-sudo mount -o loop part.bin /tmp/mnt
-echo "Hello CrystalOS!" | sudo tee /tmp/mnt/TEST.TXT
-sudo umount /tmp/mnt
+sudo dd if=ton_os.bin of=/dev/sdX bs=512 status=progress
+sync
 
-# 2. Vérifier que le fichier est bien dans part.bin
-sudo mount -o loop part.bin /tmp/mnt
-ls /tmp/mnt
-sudo umount /tmp/mnt
+lsblk
+# ou
+sudo fdisk -l
 
-# 3. Rebuilder os.bin pour inclure le part.bin mis à jour
-make
-
-# 4. Relancer QEMU
-qemu-system-i386 -m 512M \
-  -drive file=os.bin,format=raw,if=none,id=hd0 \
-  -device piix3-ide,id=ide0 \
-  -device ide-hd,bus=ide0.0,drive=hd0 \
-  -serial stdio
+qemu-system-x86_64 -usb -drive if=none,id=usbstick,format=raw,file=ton_os.bin -device usb-storage,drive=usbstick
