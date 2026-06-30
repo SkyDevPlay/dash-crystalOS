@@ -168,16 +168,6 @@ gdt_descriptor:
     dw gdt_end - gdt_start - 1
     dd gdt_start
 
-enable_a20:
-    in al, 0x92
-    test al, 2
-    jnz .done
-    or al, 2
-    and al, 0xFE
-    out 0x92, al
-.done:
-    ret
-    
 [bits 32]
 start_pm:
     mov ax, DATA_SEG
