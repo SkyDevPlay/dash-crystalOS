@@ -26,6 +26,22 @@ extern void isr17();
 extern void isr18();
 extern void isr19();
 
+typedef struct __attribute__((packed)) {
+    u32 eax;
+    u32 ecx;
+    u32 edx;
+    u32 ebx;
+    u32 esp;
+    u32 ebp;
+    u32 esi;
+    u32 edi;
+    u32 numero_exception;
+    u32 error_code;
+    u32 eip;
+    u32 cs;
+    u32 eflags;
+} registers_t;
+
 void (*int_table[20])(void) = {
     isr0,
     isr1,
