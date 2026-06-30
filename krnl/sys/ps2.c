@@ -65,6 +65,13 @@ void (*int_table[20])(void) = {
     isr19
 };
 
+void isr_handle(registers_t *regs) {
+    printf("%d\n%d", (*regs).numero_exception
+                   , (*regs).error_code);
+    while (1);
+}
+
+
 void int_handle() {
     puts("\n\nOH NO AN EXCEPTION\n\n");
     while (1);
