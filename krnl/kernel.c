@@ -36,6 +36,8 @@ eoi:
 int main(void) {
 
     init_idt();
+    int zero = 0;
+    int x = 5 / zero;
     kb_init();
     enable_interrupts();
 
