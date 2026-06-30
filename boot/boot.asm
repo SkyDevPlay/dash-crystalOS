@@ -140,7 +140,7 @@ dap:
 
 booting_msg  db "Booting...", 0
 loaded_msg   db "Kernel OK!", 0
-fs_loaded_msg db "FS loaded!", 0
+fs_loaded_msg db "FS OK!", 0
 no_ext_msg   db "No INT13 ext!", 0
 disk_err_msg db " DISK ERR", 0
 

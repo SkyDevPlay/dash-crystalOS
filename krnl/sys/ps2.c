@@ -1,6 +1,7 @@
 #include "sys/pic.h"
 #include "sys/ps2.h"
 #include "sys/ports.h"
+#include "sys/io.h"
 #include "io.h"
 
 struct IDT_entry IDT[256];
@@ -27,14 +28,14 @@ extern void isr18();
 extern void isr19();
 
 typedef struct __attribute__((packed)) {
-    u32 eax;
-    u32 ecx;
-    u32 edx;
-    u32 ebx;
-    u32 esp;
-    u32 ebp;
-    u32 esi;
     u32 edi;
+    u32 esi;
+    u32 ebp;
+    u32 esp;
+    u32 ebx;
+    u32 edx;
+    u32 ecx;
+    u32 eax;
     u32 numero_exception;
     u32 error_code;
     u32 eip;
@@ -66,7 +67,8 @@ void (*int_table[20])(void) = {
 };
 
 void isr_handle(registers_t *regs) {
-    printf("%d\n%d", (*regs).numero_exception
+    clearScreen();
+    printf("Exception %d (error code: %d)\n", (*regs).numero_exception
                    , (*regs).error_code);
     while (1);
 }

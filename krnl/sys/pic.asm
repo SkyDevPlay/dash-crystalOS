@@ -2,6 +2,7 @@
 
 extern handle_keyboard
 extern int_handle
+extern isr_handle
 
 global load_idt
 global enable_interrupts
