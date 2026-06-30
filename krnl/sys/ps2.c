@@ -68,6 +68,14 @@ void init_idt() {
         IDT[i].offset_lower = (u32)int_table[i] & 0xFFFF;
         IDT[i].offset_upper = ((u32)int_table[i] & 0xFFFF0000) >> 16;
     }
+    
+    for(int i = 20; i < 0x20; i++) {
+        IDT[i].segment = 8;
+        IDT[i].zero = 0;
+        IDT[i].type = 0b10001110;
+        IDT[i].offset_lower = (u32)int_handler & 0xFFFF;
+        IDT[i].offset_upper = ((u32)int_handler & 0xFFFF0000) >> 16;
+}
 
     // Restart PICs
     outb(PIC1_COMMAND, 0x11); 
