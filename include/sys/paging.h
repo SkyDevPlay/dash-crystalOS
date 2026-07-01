@@ -8,9 +8,9 @@
 #define PAGE_USER (1 << 2)
 
 extern u32 page_directory[1024]__attribute__((aligned(4096)));
-extern u32 page_table[1024]__attribute__((aligned(4096)));
+extern u32 page_tables[1024][1024]__attribute__((aligned(4096)));
 
-void init_paging(void);
+void init_paging(u32 available_memory);
 void enable_paging(void);
 
 #endif

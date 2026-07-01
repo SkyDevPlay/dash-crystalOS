@@ -36,15 +36,12 @@ eoi:
 
 int main(void) {
     init_idt();
-    init_paging();
-    enable_paging();
-    kb_init();
-    enable_interrupts();
-    
+
     u16 low_memory      = 1024;
     u16 upper_memory    = *((u16 *)0x802);
     u16 extended_memory = *((u16 *)0x804);
     u32 available_memory = 1024u * (low_memory + upper_memory + extended_memory * 64u);
+
     printf("Memory available : %d Ko\n", available_memory / 1024);
 
     if (init_malloc(available_memory) < 0) {
@@ -57,9 +54,10 @@ int main(void) {
         printf("Serial port failed to initialize\n");
     }
 
-    printf("lba_start = %d\n", mbr->parts[0].lba_start);
+    #define PART_LBA 2048
+    printf("lba_start = %d\n", PART_LBA);
 
-    if (init_fs(mbr->parts[0].lba_start) < 0) {
+    if (init_fs(PART_LBA) < 0) {
         setColor(RED);
         printf("FS failed\n");
         setColor(WHITE);
@@ -69,6 +67,10 @@ int main(void) {
         setColor(WHITE);
     }
 
+    init_paging(available_memory);
+    enable_paging();
+    kb_init();
+    enable_interrupts();
     shell_init();
 
     for (;;) {
