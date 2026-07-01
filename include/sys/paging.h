@@ -10,4 +10,7 @@
 extern u32 page_directory[1024]_attribute_((aligned(4096)));
 extern u32 page_table[1024]_attribute_((aligned(4096)));
 
+void init_paging(void);
+void enable_paging(void);
+
 #endif

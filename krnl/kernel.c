@@ -9,6 +9,7 @@
 #include "mbr.h"
 #include "fat.h"
 #include "shell.h"
+#include "sys/paging.h"
 
 struct mbr *mbr = (void *)0x7c00;
 
@@ -36,6 +37,8 @@ eoi:
 int main(void) {
 
     init_idt();
+    init_paging();
+    enable_paging();
     kb_init();
     enable_interrupts();
 

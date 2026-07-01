@@ -16,6 +16,7 @@ C_SRCS= \
     krnl/io.c \
     krnl/string.c \
     krnl/sys/lba.c \
+	krnl/sys/paging.c \
     krnl/fat.c \
     krnl/malloc.c \
     krnl/sys/ps2.c \
