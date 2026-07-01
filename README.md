@@ -1,13 +1,14 @@
 ```
-    ___          _       ___               _        _   _____   ___    
-   ╱   ╲__ _ ___│ │__   ╱ __╲ __ _   _ ___│ │_ __ _│ │ ╱ ___  ╲╱ __╲   
+    ___          _       ___               _        _   _____  ___    
+   ╱   ╲__ _ ___│ │__   ╱ __╲ __ _   _ ___│ │_ __ _│ │ ╱ ___ ╲╱ __╲   
   ╱ ╱╲ ╱ _` ╱ __│ '_ ╲ ╱ ╱ │ '__│ │ │ ╱ __│ __╱ _` │ │╱ ╱  ╱ ╱╲  ╲    
  ╱ ╱_╱╱ (_│ ╲__ ╲ │ │ ╱ ╱__│ │  │ │_│ ╲__ ╲ ││ (_│ │ ╱  ╲_╱ ╱ _╲  ╲   
 ╱___,' ╲__,_│___╱_│ │_╲____╱_│   ╲__, │___╱╲__╲__,_│_╲_____╱  ╲___╱   
                                  │___╱                                                       
 ```
 # dash-crystalOS v1.1
-Operating System project staring from zero
+Operating System project starting from zero
+An baremetal 32bit OS
 ## Installation guide :
 
 FIRST UPDATE > v1.1:
