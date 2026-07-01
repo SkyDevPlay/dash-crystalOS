@@ -1,18 +1,16 @@
 #include "sys/paging.h"
 
 u32 page_directory[1024]__attribute__((aligned(4096)));
-u32 page_table[NUM_PAGE_TABLES][1024]__attribute__((aligned(4096)));
+u32 page_table[1024]__attribute__((aligned(4096)));
 
 void init_paging(void) {
-    for (int t = 0; t < NUM_PAGE_TABLES; t++) {
-        for (int i = 0; i < 1024; i++) {
-            u32 addr = (t * 1024 + i) * 4096;
-            page_table[t][i] = addr | PAGE_PRESENT | PAGE_RW;
-        }
-        page_directory[t] = ((u32)page_table[t]) | PAGE_PRESENT | PAGE_RW;
+    for (int i = 0; i < 1024; i++) {
+        page_table[i] = (i * 4096) | PAGE_PRESENT | PAGE_RW;
     }
 
-    for (int i = NUM_PAGE_TABLES; i < 1024; i++) {
+    page_directory[0] = ((u32)page_table) | PAGE_PRESENT | PAGE_RW;
+
+    for (int i = 1; i > 1024; i++) {
         page_directory[i] = 0;
     }
 
