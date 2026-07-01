@@ -35,9 +35,9 @@ eoi:
 }
 
 int main(void) {
-
-    
     init_idt();
+    init_paging();
+    enable_paging();
     kb_init();
     enable_interrupts();
     
@@ -70,9 +70,7 @@ int main(void) {
     }
 
     shell_init();
-    init_paging();
-    enable_paging();
-    
+
     for (;;) {
         __asm__("hlt");
     }

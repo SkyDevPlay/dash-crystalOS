@@ -7,8 +7,10 @@
 #define PAGE_RW (1 << 1)
 #define PAGE_USER (1 << 2)
 
+#define NUM_PAGE_TABLES 16
+
 extern u32 page_directory[1024]__attribute__((aligned(4096)));
-extern u32 page_table[1024]__attribute__((aligned(4096)));
+extern u32 page_table[NUM_PAGE_TABLES][1024]__attribute__((aligned(4096)));
 
 void init_paging(void);
 void enable_paging(void);
