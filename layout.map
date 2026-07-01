@@ -139,16 +139,16 @@ Linker script and memory map
                 0x0000000000003dc0                keymap
                 0x0000000000003e40                keymap_maj
 
-.rodata         0x0000000000003ec0      0x416
+.rodata         0x0000000000003ec0      0x412
  *(.rodata)
  .rodata        0x0000000000003ec0       0x7d obj/krnl/kernel.o
  *fill*         0x0000000000003f3d        0x3 
- .rodata        0x0000000000003f40      0x2f1 obj/krnl/shell.o
- .rodata        0x0000000000004231       0x3a obj/krnl/fat.o
- *fill*         0x000000000000426b        0x1 
- .rodata        0x000000000000426c       0x33 obj/krnl/malloc.o
- *fill*         0x000000000000429f        0x1 
- .rodata        0x00000000000042a0       0x36 obj/krnl/sys/ps2.o
+ .rodata        0x0000000000003f40      0x2ed obj/krnl/shell.o
+ .rodata        0x000000000000422d       0x3a obj/krnl/fat.o
+ *fill*         0x0000000000004267        0x1 
+ .rodata        0x0000000000004268       0x33 obj/krnl/malloc.o
+ *fill*         0x000000000000429b        0x1 
+ .rodata        0x000000000000429c       0x36 obj/krnl/sys/ps2.o
                 0x0000000000020000                . = 0x20000
 
 .bss            0x0000000000020000   0x402848

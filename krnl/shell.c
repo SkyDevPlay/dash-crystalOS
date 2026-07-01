@@ -48,16 +48,17 @@ static void cmd_help(void) {
     setColor(BLUE);
     puts(" _help              Shows this message");
     puts(" _ls                List the files in the directory");
-    puts(" _ver               Information about Dash Crystal OS version");
+    puts("_ver                Information about Dash Crystal OS version");
     puts(" _sw <file>         Shows the content of a file");
     puts(" _wrt <file> <txt>  Write text in a file");
     puts(" _echo <texte>      Puts text on screen");
     puts(" _clr               Clear the screen");
 }
+
 /* _ver */
 static void cmd_ver(void) {
     setColor(DARK_CYAN);
-    puts("/-    Da$h Crystal OS version 1.1     -\ ");  
+    puts("[---Da$h Crystal OS version 1.1---]");  
     setColor(WHITE);
 }
 
