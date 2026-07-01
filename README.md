@@ -25,3 +25,15 @@ _clr                Clear the screen
 ```
 
 File System in FAT16 / Da$h shell 
+
+- A complete IDT exception handler with 20 distinct handlers
+
+- A registers_t struct correctly aligned to the actual x86 stack layout
+
+- Dynamic paging that covers all available RAM
+
+- Correct BSS initialization at boot
+
+- Resolution of a memory area conflict between the bootloader and the kernel
+
+ 
