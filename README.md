@@ -7,7 +7,8 @@
                                  │___╱                                                       
 ```
 # dash-crystalOS v1.1
-Operating System project staring from zero
+Operating System project starting from zero
+An baremetal 32bit OS
 ## Installation guide :
 
 FIRST UPDATE > v1.1:
