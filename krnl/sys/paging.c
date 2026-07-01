@@ -10,7 +10,7 @@ void init_paging(void) {
 
     page_directory[0] = ((u32)page_table) | PAGE_PRESENT | PAGE_RW;
 
-    for (int i = 1; i > 1024; i++) {
+    for (int i = 1; i < 1024; i++) {
         page_directory[i] = 0;
     }
 
