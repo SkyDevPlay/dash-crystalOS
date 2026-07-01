@@ -1,7 +1,7 @@
-#include "paging.h"
+#include "sys/paging.h"
 
-u32 page_directory[1024]_attribute_((aligned(4096)));
-u32 page_table[1024]_attribute_((aligned(4096)));
+u32 page_directory[1024]__attribute__((aligned(4096)));
+u32 page_table[1024]__attribute__((aligned(4096)));
 
 void init_paging(void) {
     for (int i = 0; i < 1024; i++) {
