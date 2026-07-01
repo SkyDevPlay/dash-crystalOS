@@ -36,12 +36,11 @@ eoi:
 
 int main(void) {
 
+    
     init_idt();
-    init_paging();
-    enable_paging();
     kb_init();
     enable_interrupts();
-
+    
     u16 low_memory      = 1024;
     u16 upper_memory    = *((u16 *)0x802);
     u16 extended_memory = *((u16 *)0x804);
@@ -71,7 +70,9 @@ int main(void) {
     }
 
     shell_init();
-
+    init_paging();
+    enable_paging();
+    
     for (;;) {
         __asm__("hlt");
     }
