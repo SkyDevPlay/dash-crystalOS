@@ -6,7 +6,7 @@ SECTIONS
     .text : { *(.text) }
     .data : { *(.data) }
     .rodata : { *(.rodata) }
-    . = 0x20000;
+    . = 0x200000;
     .bss (NOLOAD) : { 
         _bss_start = .;
         *(.bss)

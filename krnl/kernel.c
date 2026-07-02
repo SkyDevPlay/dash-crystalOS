@@ -35,14 +35,15 @@ eoi:
 }
 
 int main(void) {
-    init_idt();
+    	init_idt();
+	int zero = 0;
+	int x = 5 / zero;
+	u16 low_memory      = 1024;
+    	u16 upper_memory    = *((u16 *)0x802);
+    	u16 extended_memory = *((u16 *)0x804);
+    	u32 available_memory = 1024u * (low_memory + upper_memory + extended_memory * 64u);
 
-    u16 low_memory      = 1024;
-    u16 upper_memory    = *((u16 *)0x802);
-    u16 extended_memory = *((u16 *)0x804);
-    u32 available_memory = 1024u * (low_memory + upper_memory + extended_memory * 64u);
-
-    printf("Memory available : %d Ko\n", available_memory / 1024);
+    	printf("Memory available : %d Ko\n", available_memory / 1024);
 
     if (init_malloc(available_memory) < 0) {
         setColor(RED);
@@ -65,12 +66,11 @@ int main(void) {
         printf("FS OK!\n");
         setColor(WHITE);
     }
-
-    init_paging(available_memory);
-    enable_paging();
-    kb_init();
-    enable_interrupts();
-    shell_init();
+	init_paging(available_memory);
+	enable_paging();
+	kb_init();
+    	enable_interrupts();
+    	shell_init();
 
     for (;;) {
         __asm__("hlt");

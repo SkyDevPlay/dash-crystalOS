@@ -89,13 +89,18 @@ static const char *exception_names[20] = {
     "SIMD FP Exception"
 };
 
-void isr_handle(registers_t *regs) {
-    clearScreen();
-    printf("Exception %d (error code: %d)\n", (*regs).numero_exception
-                   , (*regs).error_code);
-    while (1);
+void isr_handle(registers_t *regs){
+	clearScreen();
+	u32 num = (*regs).numero_exception;
+	printf("Exception %d : %s (error code : %d)\n", num, exception_names[num], (*regs).error_code);
+	printf("EIP: %x CS: %x EFLAGS: %x\n", (*regs).eip, (*regs).cs, (*regs).eflags);
+    	if (num == 14) {
+		u32 cr2;
+    		asm volatile("mov %%cr1, %0" : "=r"(cr2));
+		printf("Page fault at: %x\n", cr2);
+    	while (1);
+	}
 }
-
 
 void int_handle() {
     puts("\n\nOH NO AN EXCEPTION\n\n");
