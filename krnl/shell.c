@@ -47,8 +47,9 @@ static void cmd_help(void) {
     puts("WARNING : Commands initialize themselves by having a underscore at first!");
     setColor(BLUE);
     puts(" _help              Shows this message");
+    puts(" _ver               Information about Dash Crystal OS version");
     puts(" _ls                List the files in the directory");
-    puts("_ver                Information about Dash Crystal OS version");
+    puts(" _ver                Information about Dash Crystal OS version");
     puts(" _sw <file>         Shows the content of a file");
     puts(" _wrt <file> <txt>  Write text in a file");
     puts(" _echo <texte>      Puts text on screen");

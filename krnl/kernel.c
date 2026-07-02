@@ -54,10 +54,9 @@ int main(void) {
         printf("Serial port failed to initialize\n");
     }
 
-    #define PART_LBA 2048
-    printf("lba_start = %d\n", PART_LBA);
+    printf("lba_start = %d\n", mbr->parts[0].lba_start);
 
-    if (init_fs(PART_LBA) < 0) {
+    if (init_fs(mbr->parts[0].lba_start) < 0) {
         setColor(RED);
         printf("FS failed\n");
         setColor(WHITE);
