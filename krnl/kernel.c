@@ -40,8 +40,7 @@ int main(void) {
     	u16 upper_memory    = *((u16 *)0x802);
     	u16 extended_memory = *((u16 *)0x804);
     	u32 available_memory = 1024u * (low_memory + upper_memory + extended_memory * 64u);
-    	
-        printf("Memory available : %d Ko\n", available_memory / 1024);
+    	printf("Memory available : %d Ko\n", available_memory / 1024);
 
     if (init_malloc(available_memory) < 0) {
         setColor(RED);
@@ -49,13 +48,9 @@ int main(void) {
         return 0;
     }
 
+    printf("lba_start = %d\n", mbr->parts[0].lba_start);
     init_paging(available_memory);
-    // Test : écrire directement dans le buffer VGA après pagination
-volatile char *vga = (volatile char *)0xB8000;
-vga[0] = 'X';
-vga[1] = 0x0F;  // blanc sur noir
-    enable_paging();
-
+	enable_paging();
     if (init_fs(mbr->parts[0].lba_start) < 0) {
         setColor(RED);
         printf("FS failed\n");
@@ -65,7 +60,7 @@ vga[1] = 0x0F;  // blanc sur noir
         printf("FS OK!\n");
         setColor(WHITE);
     }
-	    kb_init();
+	kb_init();
     	enable_interrupts();
     	shell_init();
 
