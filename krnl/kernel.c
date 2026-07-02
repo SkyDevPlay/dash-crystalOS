@@ -50,6 +50,10 @@ int main(void) {
     }
 
     init_paging(available_memory);
+    // Test : écrire directement dans le buffer VGA après pagination
+volatile char *vga = (volatile char *)0xB8000;
+vga[0] = 'X';
+vga[1] = 0x0F;  // blanc sur noir
     enable_paging();
 
     if (init_fs(mbr->parts[0].lba_start) < 0) {
