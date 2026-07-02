@@ -66,6 +66,29 @@ void (*int_table[20])(void) = {
     isr19
 };
 
+static const char *exception_names[20] = {
+    "Divide Error",
+    "Debug",
+    "NMI",
+    "Breakpoint",
+    "Overflow",
+    "Bound Range Exceeded",
+    "Invalid Opcode",
+    "Device Not Available",
+    "Double Fault",
+    "Reserved",
+    "Invalid TSS",
+    "Segment Not Present",
+    "Stack Fault",
+    "General Protection Fault",
+    "Page Fault",
+    "Reserved",
+    "x87 FPU Error",
+    "Alignment Check",
+    "Machine Check",
+    "SIMD FP Exception"
+};
+
 void isr_handle(registers_t *regs) {
     clearScreen();
     printf("Exception %d (error code: %d)\n", (*regs).numero_exception
