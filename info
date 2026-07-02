@@ -1,8 +1,10 @@
 sudo dd if=ton_os.bin of=/dev/sdX bs=512 status=progress
 sync
 
-lsblk
-# ou
-sudo fdisk -l
-
-qemu-system-x86_64 -usb -drive if=none,id=usbstick,format=raw,file=ton_os.bin -device usb-storage,drive=usbstick
+python3 -c "
+import re
+with open('krnl/shell.c', 'r', encoding='utf-8', errors='replace') as f:
+    content = f.read()
+with open('krnl/shell.c', 'w', encoding='ascii', errors='replace') as f:
+    f.write(content)
+"
