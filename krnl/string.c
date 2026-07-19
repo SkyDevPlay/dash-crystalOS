@@ -63,7 +63,13 @@ char *strncpy(char *dst, char *src, u32 dsize) {
 }
 
 char *strncat(char *dst, char *src, u32 n) {
-    return strncpy(dst + strlen(dst), src, n);
+    char *d = dst + strlen(dst);
+    while (n && *src) {
+        *d++ = *src++;
+        n--;
+    }
+    *d = '\0';
+    return dst;
 }
 
 int strncmp(char *s1, char *s2, u32 n) {
@@ -88,6 +94,7 @@ u32 strlen(char *str) {
 }
 
 u32 strnlen(char *s, u32 maxlen) {
-    u32 len = strlen(s);
-    return len < maxlen ? len : maxlen;
+    u32 len = 0;
+    while (len < maxlen && s[len] != '\0') len++;
+    return len;
 }

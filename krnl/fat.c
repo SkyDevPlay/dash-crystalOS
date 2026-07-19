@@ -63,21 +63,30 @@ static void clean_entry(struct fat_dir_entry *entry) {
 }
 
 int init_fs(u32 start_sector) {
-    bs          = (struct fat_bootsector *)FAT_BS_ADDR;
-    fat         = (u16 *)FAT_TABLE_ADDR;
-    root_entries = (struct fat_dir_entry *)FAT_ROOT_ADDR;
+    bs = (struct fat_bootsector *)malloc(512);
+    if (!bs) return -1;
+    ata_lba_read(start_sector, 1, bs);
 
     if (!bs->code_jump[0]) return -1;
     if (bs->bytes_per_sector != 512) return -2;
 
-    fat_addr            = start_sector + bs->resv_sectors;
-    root_addr           = fat_addr + bs->sectors_per_fat * bs->fat_count;
-    data_addr           = root_addr + (bs->root_entry_count * sizeof(struct fat_dir_entry)) / 512;
-    bytes_per_cluster   = bs->sectors_per_cluster * bs->bytes_per_sector;
+    fat_addr  = start_sector + bs->resv_sectors;
+    root_addr = fat_addr + bs->sectors_per_fat * bs->fat_count;
+    data_addr = root_addr + (bs->root_entry_count * sizeof(struct fat_dir_entry)) / 512;
+    bytes_per_cluster = bs->sectors_per_cluster * bs->bytes_per_sector;
 
+    u32 fat_sectors = bs->sectors_per_fat;
+    fat = (u16 *)malloc(fat_sectors * 512);
+    if (!fat) return -1;
+    ata_lba_read(fat_addr, fat_sectors, fat);
+    
+    u32 root_sectors = (bs->root_entry_count * sizeof(struct fat_dir_entry)) / 512;
+    root_entries = (struct fat_dir_entry *)malloc(root_sectors * 512);
+    if (!root_entries) return -1;
+    ata_lba_read(root_addr, root_sectors, root_entries);
+    
     for (int i = 0; i < bs->root_entry_count; i++)
         clean_entry(&root_entries[i]);
-
     return 0;
 }
 
@@ -164,7 +173,6 @@ int list_dir(void) {
 }
 
 FILE *fopen(char *path, char *mode) {
-    (void)mode;
     char fname[13];
     int idx = -1;
     for (int i = 0; i < (int)bs->root_entry_count; i++) {
@@ -175,7 +183,15 @@ FILE *fopen(char *path, char *mode) {
             break;
         }
     }
-    if (idx < 0) return 0;
+    
+    if (idx < 0) {
+        if (mode && mode[0] == 'w') {
+            idx = create_file(path);
+            if (idx < 0) return 0;
+        } else {
+            return 0;
+        }
+    }
 
     FILE *file = malloc(sizeof(FILE));
     file->cluster   = root_entries[idx].cluster;
@@ -281,4 +297,81 @@ u32 fwrite(void *ptr, u32 size, u32 n, FILE *stream) {
         }
     }
     return n * size - to_write;
+}
+
+static int find_empty_dir_entry(void) {
+    for (int i = 0; i < (int)bs->root_entry_count; i++) {
+        u8 c = (u8)root_entries[i].filename[0];
+        if (c == 0x00 || c == 0xE5) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+static u16 find_free_cluster(void) {
+    u32 total_clusters = bs->sectors_per_fat * 512 / 2; // FAT16 uses 2 bytes per cluster entry
+    for (u16 i = 2; i < total_clusters; i++) {
+        if (fat[i] == 0x0000) {
+            return i;
+        }
+    }
+    return 0xFFFF;
+}
+
+static void convert_to_fat_name(const char *src, char *dest_name, char *dest_ext) {
+    memset(dest_name, ' ', 8);
+    memset(dest_ext, ' ', 3);
+    
+    int i = 0;
+
+    while (src[i] && src[i] != '.' && i < 8) {
+        char c = src[i];
+        if (c >= 'a' && c <= 'z') c -= 32;
+        dest_name[i] = c;
+        i++;
+    }
+
+    while (src[i] && src[i] != '.') i++;
+    
+
+    if (src[i] == '.') {
+        i++;
+        int j = 0;
+        while (src[i] && j < 3) {
+            char c = src[i];
+            if (c >= 'a' && c <= 'z') c -= 32; 
+            dest_ext[j] = c;
+            i++;
+            j++;
+        }
+    }
+}
+
+int create_file(char *filename) {
+    int dir_idx = find_empty_dir_entry();
+    if (dir_idx < 0) return -1;
+
+    u16 cluster = find_free_cluster();
+    if (cluster == 0xFFFF) return -2;
+    
+    struct fat_dir_entry *entry = &root_entries[dir_idx];
+    memset(entry, 0, sizeof(struct fat_dir_entry));
+
+    convert_to_fat_name(filename, entry->filename, entry->extension);
+    entry->cluster = cluster;
+    entry->filesize = 0;
+    entry->attr.ReadOnly = 0;
+    entry->attr.Hidden = 0;
+    entry->attr.System = 0;
+    entry->attr.Directory = 0;
+    entry->attr.AchieveFlag = 1;
+    
+
+    fat[cluster] = 0xFFFF;
+    
+    sync_fat_sector(cluster);
+    sync_dir_entry(dir_idx);
+    
+    return dir_idx;
 }

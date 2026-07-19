@@ -44,6 +44,7 @@ enum {
 int init_fs(u32 start_sector);
 int read_file(char *filename);
 int list_dir();
+int create_file(char *filename);
 
 u32 fread(void *buf, u32 size, u32 n, FILE *stream);
 FILE *fopen(char *path, char *mode);

@@ -49,13 +49,20 @@ int printf(const char *format, ...) {
                 putchar('%');
             } else {
                 switch (*format) {
-                    case 'd':
-                        _itoa(va_arg(args, int), buf, 10);
+                    case 'd': {
+                        int val = va_arg(args, int);
+                        u32 uval = val;
+                        if (val < 0) {
+                            putchar('-');
+                            uval = -uval;
+                        }
+                        _itoa(uval, buf, 10);
                         j = 0;
                         while(buf[j]) {
                             putchar(buf[j++]);
                         }
                         break;
+                    }
                     case 'x':
                         _itoa(va_arg(args, int), buf, 16);
                         j = 0;

@@ -96,7 +96,7 @@ void isr_handle(registers_t *regs){
 	printf("EIP: %x CS: %x EFLAGS: %x\n", (*regs).eip, (*regs).cs, (*regs).eflags);
     	if (num == 14) {
 		u32 cr2;
-    		asm volatile("mov %%cr1, %0" : "=r"(cr2));
+    		asm volatile("mov %%cr2, %0" : "=r"(cr2));
 		printf("Page fault at: %x\n", cr2);
     	while (1);
 	}

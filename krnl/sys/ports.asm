@@ -9,7 +9,8 @@ global outl
 
 inb:
     mov edx, [esp + 4]
-    in eax, dx
+    xor eax, eax
+    in al, dx
     ret
 
 outb:

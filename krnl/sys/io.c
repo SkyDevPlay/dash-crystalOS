@@ -65,7 +65,7 @@ int putchar(int c) {
 }
 
 void backspace() {
-    if(!scr_y) return;
+    if (scr_x == 0 && scr_y == 0) return;
     if(scr_x == 0) {
         scr_x = SCR_WIDTH;
         scr_y--;

@@ -2,7 +2,7 @@
 #include "io.h"
 #include "types.h"
 
-#define START_ADDR 0x1000000
+#define START_ADDR 0x1900000
 #define MALLOC_ENTRY_COUNT 256
 
 u32 blob_size;
