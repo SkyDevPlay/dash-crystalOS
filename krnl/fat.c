@@ -4,9 +4,6 @@
 #include "malloc.h"
 #include "string.h"
 #define MIN(x,y) ((x)<(y)?(x):(y))
-#define FAT_BS_ADDR    0x9000
-#define FAT_TABLE_ADDR 0x9200
-#define FAT_ROOT_ADDR  0x11200
 
 struct fat_attr {
     u8 ReadOnly   : 1;
@@ -63,28 +60,33 @@ static void clean_entry(struct fat_dir_entry *entry) {
 }
 
 int init_fs(u32 start_sector) {
-    bs = (struct fat_bootsector *)malloc(512);
-    if (!bs) return -1;
-    ata_lba_read(start_sector, 1, bs);
+    printf("init_fs: start_sector=%d\n", start_sector);
 
-    if (!bs->code_jump[0]) return -1;
-    if (bs->bytes_per_sector != 512) return -2;
+    bs = (struct fat_bootsector *)malloc(512);
+    if (!bs) { printf("init_fs: bs malloc failed\n"); return -1; }
+
+    ata_lba_read(start_sector, 1, bs);
+    printf("init_fs: bs read, jump=%x bps=%d\n", bs->code_jump[0], bs->bytes_per_sector);
+
+    if (!bs->code_jump[0]) { printf("init_fs: bad jump\n"); return -1; }
+    if (bs->bytes_per_sector != 512) { printf("init_fs: bad bps\n"); return -2; }
 
     fat_addr  = start_sector + bs->resv_sectors;
     root_addr = fat_addr + bs->sectors_per_fat * bs->fat_count;
     data_addr = root_addr + (bs->root_entry_count * sizeof(struct fat_dir_entry)) / 512;
     bytes_per_cluster = bs->sectors_per_cluster * bs->bytes_per_sector;
+    printf("init_fs: fat@%d root@%d data@%d bpc=%d\n", fat_addr, root_addr, data_addr, bytes_per_cluster);
 
     u32 fat_sectors = bs->sectors_per_fat;
     fat = (u16 *)malloc(fat_sectors * 512);
-    if (!fat) return -1;
+    if (!fat) { printf("init_fs: fat malloc failed\n"); return -1; }
     ata_lba_read(fat_addr, fat_sectors, fat);
-    
+
     u32 root_sectors = (bs->root_entry_count * sizeof(struct fat_dir_entry)) / 512;
     root_entries = (struct fat_dir_entry *)malloc(root_sectors * 512);
-    if (!root_entries) return -1;
+    if (!root_entries) { printf("init_fs: root malloc failed\n"); return -1; }
     ata_lba_read(root_addr, root_sectors, root_entries);
-    
+
     for (int i = 0; i < bs->root_entry_count; i++)
         clean_entry(&root_entries[i]);
     return 0;
