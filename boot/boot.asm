@@ -10,7 +10,7 @@ xor ax, ax
 mov ds, ax
 mov es, ax
 mov ss, ax
-mov sp, 0x7C00
+mov sp, 0x9000
 mov bp, sp
 
 mov [BOOT_DISK], dl
