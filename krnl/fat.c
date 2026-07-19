@@ -160,12 +160,13 @@ int list_dir(void) {
     char attrs[9];
     for (int i = 0; i < (int)bs->root_entry_count; i++) {
         struct fat_dir_entry entry = root_entries[i];
-        if (entry.filename[0] == 0) break;
+        if (entry.filename[0] == 0x00) break;
+        if ((u8)entry.filename[0] == 0xE5) continue;
         format_attrs(entry.attr, attrs);
         printf(
             entry.attr.Directory || *entry.extension == 0
-                ? "%s %d-%d-%d %d:%d:%d %s\n"
-                : "%s %d-%d-%d %d:%d:%d %s.%s\n",
+                ? "%s %d-%02d-%02d %02d:%02d:%02d %s\n"
+                : "%s %d-%02d-%02d %02d:%02d:%02d %s.%s\n",
             attrs,
             entry.c_date.Year + 1980, entry.c_date.Month, entry.c_date.Day,
             entry.c_time.Hour, entry.c_time.Minute, entry.c_time.Second * 2,
@@ -356,24 +357,34 @@ int create_file(char *filename) {
 
     u16 cluster = find_free_cluster();
     if (cluster == 0xFFFF) return -2;
-    
+
     struct fat_dir_entry *entry = &root_entries[dir_idx];
     memset(entry, 0, sizeof(struct fat_dir_entry));
 
     convert_to_fat_name(filename, entry->filename, entry->extension);
-    entry->cluster = cluster;
+    entry->cluster  = cluster;
     entry->filesize = 0;
-    entry->attr.ReadOnly = 0;
-    entry->attr.Hidden = 0;
-    entry->attr.System = 0;
-    entry->attr.Directory = 0;
+    entry->attr.ReadOnly   = 0;
+    entry->attr.Hidden     = 0;
+    entry->attr.System     = 0;
+    entry->attr.Directory  = 0;
     entry->attr.AchieveFlag = 1;
-    
+
+    entry->c_date.Year  = 0;
+    entry->c_date.Month = 1;
+    entry->c_date.Day   = 1;
+    entry->c_time.Hour   = 0;
+    entry->c_time.Minute = 0;
+    entry->c_time.Second = 0;
+
+    entry->w_date = entry->c_date;
+    entry->w_time = entry->c_time;
+    entry->a_date = entry->c_date;
 
     fat[cluster] = 0xFFFF;
-    
+
     sync_fat_sector(cluster);
     sync_dir_entry(dir_idx);
-    
+
     return dir_idx;
 }
