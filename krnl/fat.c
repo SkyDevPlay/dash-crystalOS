@@ -114,13 +114,26 @@ static void format_entry(struct fat_dir_entry entry, char buf[13]) {
     strncat(buf, entry.extension, 3);
 }
 
+static int filename_match(char *f1, char *f2) {
+    while (*f1 || *f2) {
+        char c1 = *f1;
+        char c2 = *f2;
+        if (c1 >= 'a' && c1 <= 'z') c1 -= 32;
+        if (c2 >= 'a' && c2 <= 'z') c2 -= 32;
+        if (c1 != c2) return 0;
+        f1++;
+        f2++;
+    }
+    return 1;
+}
+
 int read_file(char *filename) {
     char fname[13];
     int idx = -1;
     for (int i = 0; i < (int)bs->root_entry_count; i++) {
         struct fat_dir_entry entry = root_entries[i];
         format_entry(entry, fname);
-        if (strcmp(fname, filename) == 0 && !entry.attr.Directory) {
+        if (filename_match(fname, filename) && !entry.attr.Directory) {
             idx = i;
             break;
         }
@@ -161,6 +174,7 @@ int list_dir(void) {
     for (int i = 0; i < (int)bs->root_entry_count; i++) {
         struct fat_dir_entry entry = root_entries[i];
         if (entry.filename[0] == 0) break;
+        if ((u8)entry.filename[0] == 0xE5) continue;
         format_attrs(entry.attr, attrs);
         printf(
             entry.attr.Directory || *entry.extension == 0
@@ -180,7 +194,7 @@ FILE *fopen(char *path, char *mode) {
     for (int i = 0; i < (int)bs->root_entry_count; i++) {
         struct fat_dir_entry entry = root_entries[i];
         format_entry(entry, fname);
-        if (strcmp(fname, path) == 0 && !entry.attr.Directory) {
+        if (filename_match(fname, path) && !entry.attr.Directory) {
             idx = i;
             break;
         }
@@ -369,6 +383,7 @@ int create_file(char *filename) {
     entry->attr.Directory = 0;
     entry->attr.AchieveFlag = 1;
     
+    clean_entry(entry);
 
     fat[cluster] = 0xFFFF;
     
