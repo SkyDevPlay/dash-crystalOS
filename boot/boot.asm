@@ -10,7 +10,7 @@ xor ax, ax
 mov ds, ax
 mov es, ax
 mov ss, ax
-mov sp, 0x9000
+mov sp, 0x7C00
 mov bp, sp
 
 mov [BOOT_DISK], dl
@@ -60,8 +60,43 @@ mov cr0, eax
 jmp CODE_SEG:start_pm
 
 disk_error:
+    ; Print "ERR:"
+    mov si, err_prefix
+    call print
+
+    ; Print AH (error code) in hex
     mov al, ah
+    call print_hex
+
+    ; Print space
+    mov al, ' '
+    mov ah, 0x0E
+    mov bh, 0
+    int 10h
+
+    ; Print "DRV:"
+    mov si, drv_prefix
+    call print
+
+    ; Print DL (drive number) in hex
+    mov al, [BOOT_DISK]
+    call print_hex
+
+    mov si, disk_err_msg
+    call print
+    jmp $
+
+print_hex:
+    push ax
     shr al, 4
+    and al, 0x0F
+    call print_hex_digit
+    pop ax
+    and al, 0x0F
+    call print_hex_digit
+    ret
+
+print_hex_digit:
     add al, '0'
     cmp al, '9'
     jle .low
@@ -70,9 +105,10 @@ disk_error:
     mov ah, 0x0E
     mov bh, 0
     int 10h
-    mov si, disk_err_msg
-    call print
-    jmp $
+    ret
+
+err_prefix   db "ERR:", 0
+drv_prefix   db "DRV:", 0
 
 %include "boot/fprint.asm"
 
