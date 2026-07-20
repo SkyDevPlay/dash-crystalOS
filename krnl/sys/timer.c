@@ -1,7 +1,6 @@
 #include "sys/timer.h"
 #include "sys/ports.h"
 #include "sys/pic.h"
-#include "io.h"
 
 static volatile u32 ticks = 0;
 static u32 timer_frequency = 100; // default 100Hz
@@ -28,12 +27,6 @@ void init_timer(u32 frequency) {
 
 void handle_timer(void) {
     ticks++;
-
-    // Print a serial debug tick every second (assuming 100Hz frequency)
-    if (ticks % 100 == 0) {
-        serial_printf("[TIMER] System uptime: %d seconds (%d ticks)\n", ticks / 100, ticks);
-    }
-
     // Send End of Interrupt (EOI) to PIC1
     outb(PIC1_COMMAND, 0x20);
 }
