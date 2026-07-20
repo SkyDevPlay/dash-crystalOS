@@ -58,6 +58,7 @@ static void cmd_help(void) {
     puts(" _clr               Clear the screen");
     puts(" _date              Shows the system date");
     puts(" _setdate <y> <m> <d>  Set the system date");
+    puts(" _setfdate <f> <y> <m> <d>  Set a file's date");
 }
 
 /* _ver */
@@ -182,6 +183,34 @@ static void cmd_setdate(int argc, char *argv[]) {
     setColor(WHITE);
 }
 
+/* _setfdate <file> <year> <month> <day> */
+static void cmd_setfdate(int argc, char *argv[]) {
+    if (argc < 5) {
+        setColor(RED);
+        puts("Usage : _setfdate <file> <year> <month> <day>");
+        setColor(WHITE);
+        return;
+    }
+
+    int year  = atoi(argv[2]);
+    int month = atoi(argv[3]);
+    int day   = atoi(argv[4]);
+
+    if (set_file_date(argv[1], year, month, day) < 0) {
+        setColor(RED);
+        printf("setfdate : file '%s' not found\n", argv[1]);
+        setColor(WHITE);
+        return;
+    }
+
+    setColor(GREEN);
+    printf("Date of '%s' set to:", argv[1]);
+    putchar('\n');
+    setColor(YELLOW);
+    printf("%d-%d-%d\n", year, month, day);
+    setColor(WHITE);
+}
+
 static void execute_command(char *input) {
     static char buf[MAX_CMD];
     strncpy(buf, input, MAX_CMD - 1);
@@ -201,6 +230,7 @@ static void execute_command(char *input) {
     else if (strcmp(argv[0], "_clr") == 0) cmd_clr();
     else if (strcmp(argv[0], "_date") == 0) cmd_date();
     else if (strcmp(argv[0], "_setdate") == 0) cmd_setdate(argc, argv);
+    else if (strcmp(argv[0], "_setfdate") == 0) cmd_setfdate(argc, argv);
     else {
         setColor(RED);
         printf("Unknown command: '%s'  (use '_help')\n", argv[0]);
