@@ -10,6 +10,7 @@
 #include "fat.h"
 #include "shell.h"
 #include "sys/paging.h"
+#include "sys/rtc.h"
 
 struct mbr *mbr = (void *)0x7c00;
 
@@ -60,6 +61,7 @@ int main(void) {
         printf("FS OK!\n");
         setColor(WHITE);
     }
+	rtc_init();
 	kb_init();
     	enable_interrupts();
     	shell_init();

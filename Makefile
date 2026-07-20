@@ -22,6 +22,7 @@ C_SRCS= \
     krnl/sys/ps2.c \
     krnl/sys/io.c \
     krnl/sys/serial.c \
+    krnl/sys/rtc.c \
     krnl/sys/keymap.c
 
 ASM_SRCS= \

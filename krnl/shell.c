@@ -1,6 +1,7 @@
 #include "shell.h"
 #include "sys/keymap.h"
 #include "sys/io.h"
+#include "sys/rtc.h"
 #include "io.h"
 #include "fat.h"
 #include "string.h"
@@ -55,6 +56,8 @@ static void cmd_help(void) {
     puts(" _wrt <file> <txt>  Write text in a file");
     puts(" _echo <texte>      Puts text on screen");
     puts(" _clr               Clear the screen");
+    puts(" _date              Shows the system date");
+    puts(" _setdate <y> <m> <d>  Set the system date");
 }
 
 /* _ver */
@@ -146,6 +149,39 @@ static void cmd_clr(void) {
     clearScreen();
 }
 
+/* _date */
+static void cmd_date(void) {
+    struct SystemDate d;
+    get_system_date(&d);
+    setColor(YELLOW);
+    printf("%d-%d-%d %d:%d:%d\n",
+        d.year, d.month, d.day,
+        d.hour, d.minute, d.second);
+    setColor(WHITE);
+}
+
+/* _setdate <year> <month> <day> */
+static void cmd_setdate(int argc, char *argv[]) {
+    if (argc < 4) {
+        setColor(RED);
+        puts("Usage : _setdate <year> <month> <day>");
+        setColor(WHITE);
+        return;
+    }
+
+    int year  = atoi(argv[1]);
+    int month = atoi(argv[2]);
+    int day   = atoi(argv[3]);
+
+    set_system_date((u16)year, (u8)month, (u8)day);
+
+    setColor(GREEN);
+    puts("System date set to:");
+    setColor(YELLOW);
+    printf("%d-%d-%d\n", year, month, day);
+    setColor(WHITE);
+}
+
 static void execute_command(char *input) {
     static char buf[MAX_CMD];
     strncpy(buf, input, MAX_CMD - 1);
@@ -163,6 +199,8 @@ static void execute_command(char *input) {
     else if (strcmp(argv[0], "_wrt") == 0) cmd_wrt(argc, argv);
     else if (strcmp(argv[0], "_echo")  == 0) cmd_echo(argc, argv);
     else if (strcmp(argv[0], "_clr") == 0) cmd_clr();
+    else if (strcmp(argv[0], "_date") == 0) cmd_date();
+    else if (strcmp(argv[0], "_setdate") == 0) cmd_setdate(argc, argv);
     else {
         setColor(RED);
         printf("Unknown command: '%s'  (use '_help')\n", argv[0]);

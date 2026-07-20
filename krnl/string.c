@@ -98,3 +98,14 @@ u32 strnlen(char *s, u32 maxlen) {
     while (len < maxlen && s[len] != '\0') len++;
     return len;
 }
+
+int atoi(char *s) {
+    int n = 0;
+    int neg = 0;
+    if (*s == '-') { neg = 1; s++; }
+    while (*s >= '0' && *s <= '9') {
+        n = n * 10 + (*s - '0');
+        s++;
+    }
+    return neg ? -n : n;
+}

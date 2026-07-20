@@ -23,4 +23,6 @@ int strncmp(char *s1, char *s2, u32 n);
 
 u32 strnlen(char *s, u32 maxlen);
 
+int atoi(char *s);
+
 #endif
