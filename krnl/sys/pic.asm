@@ -1,12 +1,14 @@
 [bits 32]
 
 extern handle_keyboard
+extern handle_timer
 extern int_handle
 extern isr_handle
 
 global load_idt
 global enable_interrupts
 global keyboard_handler
+global timer_handler
 global int_handler
 
 global isr0
@@ -38,6 +40,13 @@ load_idt:
 enable_interrupts:
     sti
     ret
+
+timer_handler:
+    pushad
+    cld
+    call handle_timer
+    popad
+    iretd
 
 keyboard_handler:
     pushad

@@ -11,6 +11,7 @@
 #include "shell.h"
 #include "sys/paging.h"
 #include "sys/rtc.h"
+#include "sys/timer.h"
 
 struct mbr *mbr = (void *)0x7c00;
 
@@ -35,33 +36,46 @@ eoi:
     outb(PIC1_COMMAND, 0x20);
 }
 
+#include "sys/serial.h"
+
 int main(void) {
-    	init_idt();
-	    u16 low_memory      = 1024;
-    	u16 upper_memory    = *((u16 *)0x802);
-    	u16 extended_memory = *((u16 *)0x804);
-    	u32 available_memory = 1024u * (low_memory + upper_memory + extended_memory * 64u);
-    	printf("Memory available : %d Ko\n", available_memory / 1024);
+    init_idt();
+    initSerial(0x3F8);
+    serial_printf("[DEBUG] Dash Crystal OS Serial Debugger Initialized.\n");
+
+    u16 low_memory      = 1024;
+    u16 upper_memory    = *((u16 *)0x802);
+    u16 extended_memory = *((u16 *)0x804);
+    u32 available_memory = 1024u * (low_memory + upper_memory + extended_memory * 64u);
+    printf("Memory available : %d Ko\n", available_memory / 1024);
+    serial_printf("[DEBUG] Memory detected: %d Ko\n", available_memory / 1024);
 
     if (init_malloc(available_memory) < 0) {
         setColor(RED);
         puts("ERROR: init_malloc crashed");
+        serial_printf("[DEBUG] Malloc initialization crashed.\n");
         return 0;
     }
+    serial_printf("[DEBUG] Malloc initialized successfully.\n");
 
     printf("lba_start = %d\n", mbr->parts[0].lba_start);
+    serial_printf("[DEBUG] First partition LBA start: %d\n", mbr->parts[0].lba_start);
     init_paging(available_memory);
 	enable_paging();
+    serial_printf("[DEBUG] Paging enabled.\n");
     if (init_fs(mbr->parts[0].lba_start) < 0) {
         setColor(RED);
         printf("FS failed\n");
         setColor(WHITE);
+        serial_printf("[DEBUG] Filesystem initialization failed.\n");
     } else {
         setColor(GREEN);
         printf("FS OK!\n");
         setColor(WHITE);
+        serial_printf("[DEBUG] Filesystem initialized successfully.\n");
     }
 	rtc_init();
+    init_timer(100);
 	kb_init();
     	enable_interrupts();
     	shell_init();

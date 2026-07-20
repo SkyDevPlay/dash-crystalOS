@@ -6,6 +6,7 @@
 
 struct IDT_entry IDT[256];
 
+extern void timer_handler();
 extern void isr0();
 extern void isr1();
 extern void isr2();
@@ -108,6 +109,14 @@ void int_handle() {
 }
 
 void init_idt() {
+    // IRQ0 - PIT Timer
+    IDT[0x20].segment = 8;
+    IDT[0x20].zero = 0;
+    IDT[0x20].type = 0b10001110;
+    IDT[0x20].offset_lower = (u32)timer_handler & 0xFFFF;
+    IDT[0x20].offset_upper = ((u32)timer_handler & 0xFFFF0000) >> 16;
+
+    // IRQ1 - Keyboard
     IDT[0x21].segment = 8;
     IDT[0x21].zero = 0;
     IDT[0x21].type = 0b10001110;
@@ -157,5 +166,5 @@ void init_idt() {
 }
 
 void kb_init() {
-    outb(PIC1_DATA, 0b11111101); // Unmask IRQ1
+    outb(PIC1_DATA, 0b11111100); // Unmask IRQ0 (timer) and IRQ1 (keyboard)
 }

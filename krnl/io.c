@@ -100,3 +100,66 @@ int puts(const char *s) {
     putchar('\n');
     return 0;
 }
+
+#include "sys/serial.h"
+
+int serial_printf(const char *format, ...) {
+    void* args;
+    va_start(args, format);
+    
+    char buf[32];
+    u8 j = 0;
+    u8 is_f = 0;
+    char *str;
+    while (*format) {
+        if (is_f) {
+            is_f = 0;
+            if (*format == '%') {
+                writeSerial(0x3F8, '%');
+            } else {
+                switch (*format) {
+                    case 'd': {
+                        int val = va_arg(args, int);
+                        u32 uval = val;
+                        if (val < 0) {
+                            writeSerial(0x3F8, '-');
+                            uval = -uval;
+                        }
+                        _itoa(uval, buf, 10);
+                        j = 0;
+                        while(buf[j]) {
+                            writeSerial(0x3F8, buf[j++]);
+                        }
+                        break;
+                    }
+                    case 'x':
+                        _itoa(va_arg(args, int), buf, 16);
+                        j = 0;
+                        while(buf[j]) {
+                            writeSerial(0x3F8, buf[j++]);
+                        }
+                        break;
+                    case 's':
+                        str = va_arg(args, char *);
+                        while(*str) writeSerial(0x3F8, (u8)*str++);
+                        break;
+                    case 'c':
+                        writeSerial(0x3F8, (u8)va_arg(args, int));
+                        break;
+                    default:
+                        writeSerial(0x3F8, 'E');
+                        writeSerial(0x3F8, 'R');
+                        writeSerial(0x3F8, 'R');
+                }
+            }
+        } else {
+            if (*format == '%') {
+                is_f = 1;
+            } else {
+                writeSerial(0x3F8, (u8)*format);
+            }
+        }
+        format++;
+    }
+    return 0;
+}
