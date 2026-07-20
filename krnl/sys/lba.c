@@ -42,10 +42,11 @@ static int ata_poll(void) {
     return -1;
 }
 
-void ata_lba_read(u32 sector, u8 count, void *buf) {
+int ata_lba_read(u32 sector, u8 count, void *buf) {
+    if (!count || !buf) return -1;
     outb(ATA_DRIVE,   0xE0 | ((sector >> 24) & 0x0F));
     ata_delay();
-    if (ata_wait_ready() < 0) return;
+    if (ata_wait_ready() < 0) return -1;
 
     outb(ATA_FEATURE, 0x00);
     outb(ATA_COUNT,   count);
@@ -56,18 +57,20 @@ void ata_lba_read(u32 sector, u8 count, void *buf) {
     outb(ATA_CMD,     0x20);
 
     for (int a = 0; a < count; a++) {
-        if (ata_poll() < 0) return;
+        if (ata_poll() < 0) return -1;
         u16 *p = (u16 *)buf;
         for (int i = 0; i < 256; i++)
             p[i] = inw(ATA_DATA);
         buf = (u8 *)buf + 512;
     }
+    return 0;
 }
 
-void ata_lba_write(u32 sector, u8 count, void *buf) {
+int ata_lba_write(u32 sector, u8 count, void *buf) {
+    if (!count || !buf) return -1;
     outb(ATA_DRIVE,   0xE0 | ((sector >> 24) & 0x0F));
     ata_delay();
-    if (ata_wait_ready() < 0) return;
+    if (ata_wait_ready() < 0) return -1;
 
     outb(ATA_FEATURE, 0x00);
     outb(ATA_COUNT,   count);
@@ -78,10 +81,11 @@ void ata_lba_write(u32 sector, u8 count, void *buf) {
     outb(ATA_CMD,     0x30);
 
     for (int a = 0; a < count; a++) {
-        if (ata_poll() < 0) return;
+        if (ata_poll() < 0) return -1;
         u16 *p = (u16 *)buf;
         for (int i = 0; i < 256; i++)
             outw(ATA_DATA, p[i]);
         buf = (u8 *)buf + 512;
     }
+    return 0;
 }

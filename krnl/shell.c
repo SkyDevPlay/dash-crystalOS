@@ -173,7 +173,12 @@ static void cmd_setdate(int argc, char *argv[]) {
     int month = atoi(argv[2]);
     int day   = atoi(argv[3]);
 
-    set_system_date((u16)year, (u8)month, (u8)day);
+    if (set_system_date((u16)year, (u8)month, (u8)day) < 0) {
+        setColor(RED);
+        puts("Invalid date (year 2000-2099, month 1-12, day 1-31).");
+        setColor(WHITE);
+        return;
+    }
 
     setColor(GREEN);
     puts("System date set to:");

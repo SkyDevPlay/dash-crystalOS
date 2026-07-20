@@ -1,6 +1,7 @@
 #include "malloc.h"
 #include "io.h"
 #include "types.h"
+#include "string.h"
 
 #define START_ADDR 0x1900000
 #define MALLOC_ENTRY_COUNT 256
@@ -15,6 +16,7 @@ int init_malloc(u32 mem_size){
     malloc_entries = (malloc_entry *)START_ADDR;
     malloc_blob = (void*)malloc_entries + sizeof(malloc_entry) * MALLOC_ENTRY_COUNT;
     blob_size = mem_size - (u32)malloc_blob;
+    memset(malloc_entries, 0, sizeof(malloc_entry) * MALLOC_ENTRY_COUNT);
     printf("Malloc entries at 0x%x array at 0x%x of size %dKb\n", malloc_entries, malloc_blob, blob_size/1024);
 
     return 0;
@@ -70,6 +72,7 @@ int find_up_nearest(void *ptr){
 }
 
 void *malloc(u32 size){
+    if (size == 0) return 0;
     int entry = find_empty_entry();
     if(entry < 0) return 0;
 

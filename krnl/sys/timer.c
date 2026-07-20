@@ -6,6 +6,8 @@ static volatile u32 ticks = 0;
 static u32 timer_frequency = 100; // default 100Hz
 
 void init_timer(u32 frequency) {
+    if (frequency == 0) frequency = 100;
+    if (frequency > 1193182) frequency = 1193182;
     timer_frequency = frequency;
     u32 divisor = 1193182 / frequency;
 

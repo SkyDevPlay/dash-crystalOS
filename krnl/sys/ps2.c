@@ -93,14 +93,16 @@ static const char *exception_names[20] = {
 void isr_handle(registers_t *regs){
 	clearScreen();
 	u32 num = (*regs).numero_exception;
+	if (num >= 20) num = 19;
 	printf("Exception %d : %s (error code : %d)\n", num, exception_names[num], (*regs).error_code);
 	printf("EIP: %x CS: %x EFLAGS: %x\n", (*regs).eip, (*regs).cs, (*regs).eflags);
     	if (num == 14) {
 		u32 cr2;
     		asm volatile("mov %%cr2, %0" : "=r"(cr2));
 		printf("Page fault at: %x\n", cr2);
-    	while (1);
 	}
+	puts("System halted.");
+	for (;;) __asm__("cli; hlt");
 }
 
 void int_handle() {
@@ -161,7 +163,7 @@ void init_idt() {
 
     struct IDT_pointer idt_ptr;
     idt_ptr.offset = (u32)&IDT;
-    idt_ptr.limit = sizeof(struct IDT_entry)*256;
+    idt_ptr.limit = sizeof(struct IDT_entry)*256 - 1;
     load_idt(&idt_ptr);
 }
 

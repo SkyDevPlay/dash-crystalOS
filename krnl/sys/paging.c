@@ -5,6 +5,7 @@ u32 page_tables[1024][1024]__attribute__((aligned(4096)));
 
 void init_paging(u32 available_memory) {
     u32 num_tables = (available_memory + 4194304 - 1) / 4194304;
+    if (num_tables > 1024) num_tables = 1024;
     for (u32 j = 0; j < num_tables; j++){
         for (int i = 0; i < 1024; i++) {
             page_tables[j][i] = ((j * 1024 + i) * 4096) | PAGE_PRESENT | PAGE_RW;
