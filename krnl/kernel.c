@@ -60,10 +60,9 @@ int main(void) {
 
     printf("lba_start = %d\n", mbr->parts[0].lba_start);
     serial_printf("[DEBUG] First partition LBA start: %d\n", mbr->parts[0].lba_start);
-    // Paging disabled - causes triple fault (page_tables in BSS conflict)
-    // init_paging(available_memory);
-    // enable_paging();
-    serial_printf("[DEBUG] Paging skipped.\n");
+    init_paging(available_memory);
+    enable_paging();
+    serial_printf("[DEBUG] Identity paging enabled.\n");
     if (init_fs(mbr->parts[0].lba_start) < 0) {
         setColor(RED);
         printf("FS failed\n");
@@ -87,4 +86,3 @@ int main(void) {
 
     return 0;
 }
-
