@@ -181,19 +181,19 @@ static void format_attrs(struct fat_attr attrs, char *buf) {
 
 int list_dir(void) {
     char attrs[9];
+    char name[13];
     for (int i = 0; i < (int)bs->root_entry_count; i++) {
         struct fat_dir_entry entry = root_entries[i];
         if (entry.filename[0] == 0) break;
         if ((u8)entry.filename[0] == 0xE5) continue;
+        if ((u8)entry.attr == 0x0F) continue; /* Long-file-name helper entry. */
+        format_entry(entry, name);
         format_attrs(entry.attr, attrs);
-        printf(
-            entry.attr.Directory || *entry.extension == 0
-                ? "%s %d-%d-%d %d:%d:%d %s\n"
-                : "%s %d-%d-%d %d:%d:%d %s.%s\n",
+        printf("%s %d-%d-%d %d:%d:%d %s\n",
             attrs,
             entry.c_date.Year + 1980, entry.c_date.Month, entry.c_date.Day,
             entry.c_time.Hour, entry.c_time.Minute, entry.c_time.Second * 2,
-            entry.filename, entry.extension);
+            name);
     }
     return 0;
 }
