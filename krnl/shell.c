@@ -5,6 +5,8 @@
 #include "fat.h"
 #include "string.h"
 #include "malloc.h"
+#include "sys/lba.h"
+#define MIN(x,y) ((x)<(y)?(x):(y))
 
 static char cmd[MAX_CMD];
 static int  cmd_len = 0;
