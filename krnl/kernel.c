@@ -62,7 +62,9 @@ int main(void) {
     serial_printf("[DEBUG] First partition LBA start: %d\n", mbr->parts[0].lba_start);
     init_paging(available_memory);
 	enable_paging();
+    printf("[DBG] paging on\n");
     serial_printf("[DEBUG] Paging enabled.\n");
+    printf("[DBG] calling init_fs\n");
     if (init_fs(mbr->parts[0].lba_start) < 0) {
         setColor(RED);
         printf("FS failed\n");
