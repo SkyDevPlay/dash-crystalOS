@@ -186,7 +186,7 @@ int list_dir(void) {
         struct fat_dir_entry entry = root_entries[i];
         if (entry.filename[0] == 0) break;
         if ((u8)entry.filename[0] == 0xE5) continue;
-        if ((u8)entry.attr == 0x0F) continue; /* Long-file-name helper entry. */
+        if (*((u8 *)&entry.attr) == 0x0F) continue; /* Long-file-name helper entry. */
         format_entry(entry, name);
         format_attrs(entry.attr, attrs);
         printf("%s %d-%d-%d %d:%d:%d %s\n",
