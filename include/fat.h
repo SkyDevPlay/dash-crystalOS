@@ -52,4 +52,6 @@ int fseek(FILE *stream, long offset, int whence);
 int fclose(FILE *stream);
 u32 fwrite(void *ptr, u32 size, u32 n, FILE *stream);
 
+int set_file_date(char *filename, int year, int month, int day);
+
 #endif

@@ -392,3 +392,18 @@ int create_file(char *filename) {
     
     return dir_idx;
 }
+
+int set_file_date(char *filename, int year, int month, int day) {
+    char fname[13];
+    for (int i = 0; i < (int)bs->root_entry_count; i++) {
+        format_entry(root_entries[i], fname);
+        if (filename_match(fname, filename)) {
+            root_entries[i].c_date.Year  = year - 1980;
+            root_entries[i].c_date.Month = month;
+            root_entries[i].c_date.Day   = day;
+            sync_dir_entry(i);
+            return 0;
+        }
+    }
+    return -1;
+}
