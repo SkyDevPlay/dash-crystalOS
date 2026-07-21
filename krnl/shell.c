@@ -201,15 +201,17 @@ static void cmd_setdate(int argc, char *argv[]) {
 }
 
 static void cmd_tasks(void) {
-    setColor(YELLOW);
-    printf("%d task(s):\n", task_count());
+    setColor(DARK_BLUE);
+    printf("| TASKMGR |\n");
+    setColor(GREEN);
+    printf("-> %d task(s):\n", task_count());
     task_list();
     setColor(WHITE);
 }
 
 static void cmd_tasktest(void) {
     if (task_test_id < 0)
-        task_test_id = task_create(task_test_worker, "timer-test");
+        task_test_id = task_create(task_test_worker, "timer-test v0.1");
     if (task_test_id < 0) {
         setColor(RED);
         puts("Unable to create task.");
@@ -217,7 +219,7 @@ static void cmd_tasktest(void) {
         return;
     }
     setColor(GREEN);
-    printf("Task %d running; worker ticks: %d\n", task_test_id, task_test_ticks);
+    printf("| Task %d running! | \nTotal worker ticks: %d\n", task_test_id, task_test_ticks);
     setColor(WHITE);
 }
 
