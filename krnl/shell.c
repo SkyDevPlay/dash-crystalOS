@@ -7,10 +7,21 @@
 #include "string.h"
 #include "malloc.h"
 #include "sys/lba.h"
+#include "sys/task.h"
+#include "sys/timer.h"
 #define MIN(x,y) ((x)<(y)?(x):(y))
 
 static char cmd[MAX_CMD];
 static int  cmd_len = 0;
+static volatile u32 task_test_ticks = 0;
+static int task_test_id = -1;
+
+static void task_test_worker(void) {
+    for (;;) {
+        task_test_ticks++;
+        sleep(10);
+    }
+}
 
 
 static void print_prompt(void) {
@@ -49,15 +60,17 @@ static void cmd_help(void) {
     setColor(RED);
     puts("WARNING : Commands initialize themselves by having a underscore at first!");
     setColor(BLUE);
-    puts(" _help              Shows this message");
-    puts(" _ver               Information about Dash Crystal OS version");
-    puts(" _ls                List the files in the directory");
-    puts(" _sw <file>         Shows the content of a file");
-    puts(" _wrt <file> <txt>  Write text in a file");
-    puts(" _echo <texte>      Puts text on screen");
-    puts(" _clr               Clear the screen");
-    puts(" _date              Shows the system date");
-    puts(" _setdate <y> <m> <d>  Set the system date");
+    puts(" _help                    Shows this message");
+    puts(" _ver                     Information about Dash Crystal OS version");
+    puts(" _ls                      List the files in the directory");
+    puts(" _sw <file>               Shows the content of a file");
+    puts(" _wrt <file> <txt>        Write text in a file");
+    puts(" _echo <texte>            Puts text on screen");
+    puts(" _clr                     Clear the screen");
+    puts(" _date                    Shows the system date");
+    puts(" _setdate <y> <m> <d>     Set the system date");
+    puts(" _tsk                     List scheduled tasks");
+    puts(" _tsktst                  Start/show a scheduler test task");
 }
 
 /* _ver */
@@ -187,6 +200,27 @@ static void cmd_setdate(int argc, char *argv[]) {
     setColor(WHITE);
 }
 
+static void cmd_tasks(void) {
+    setColor(YELLOW);
+    printf("%d task(s):\n", task_count());
+    task_list();
+    setColor(WHITE);
+}
+
+static void cmd_tasktest(void) {
+    if (task_test_id < 0)
+        task_test_id = task_create(task_test_worker, "timer-test");
+    if (task_test_id < 0) {
+        setColor(RED);
+        puts("Unable to create task.");
+        setColor(WHITE);
+        return;
+    }
+    setColor(GREEN);
+    printf("Task %d running; worker ticks: %d\n", task_test_id, task_test_ticks);
+    setColor(WHITE);
+}
+
 static void execute_command(char *input) {
     static char buf[MAX_CMD];
     strncpy(buf, input, MAX_CMD - 1);
@@ -206,6 +240,8 @@ static void execute_command(char *input) {
     else if (strcmp(argv[0], "_clr") == 0) cmd_clr();
     else if (strcmp(argv[0], "_date") == 0) cmd_date();
     else if (strcmp(argv[0], "_setdate") == 0) cmd_setdate(argc, argv);
+    else if (strcmp(argv[0], "_tsk") == 0) cmd_tasks();
+    else if (strcmp(argv[0], "_tsktst") == 0) cmd_tasktest();
     else {
         setColor(RED);
         printf("Unknown command: '%s'  (use '_help')\n", argv[0]);

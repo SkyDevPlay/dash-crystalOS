@@ -24,7 +24,8 @@ C_SRCS= \
     krnl/sys/serial.c \
     krnl/sys/rtc.c \
     krnl/sys/keymap.c \
-    krnl/sys/timer.c
+    krnl/sys/timer.c \
+    krnl/sys/task.c
 
 ASM_SRCS= \
     krnl/link.asm \

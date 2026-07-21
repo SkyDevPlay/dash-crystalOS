@@ -2,6 +2,7 @@
 
 extern handle_keyboard
 extern handle_timer
+extern task_schedule
 extern int_handle
 extern isr_handle
 
@@ -45,6 +46,10 @@ timer_handler:
     pushad
     cld
     call handle_timer
+    push esp
+    call task_schedule
+    add esp, 4
+    mov esp, eax
     popad
     iretd
 

@@ -12,6 +12,7 @@
 #include "sys/paging.h"
 #include "sys/rtc.h"
 #include "sys/timer.h"
+#include "sys/task.h"
 
 struct mbr *mbr = (void *)0x7c00;
 
@@ -56,7 +57,9 @@ int main(void) {
         serial_printf("[DEBUG] Malloc initialization crashed.\n");
         return 0;
     }
+    task_init();
     serial_printf("[DEBUG] Malloc initialized successfully.\n");
+    serial_printf("[DEBUG] Scheduler initialized.\n");
 
     printf("lba_start = %d\n", mbr->parts[0].lba_start);
     serial_printf("[DEBUG] First partition LBA start: %d\n", mbr->parts[0].lba_start);

@@ -37,8 +37,6 @@ mov es, ax
 mov bx, KERNEL_LOCATION
 
 mov ah, 0x02
-; Keep the loaded kernel below the boot sector at 0x7C00.  Forty sectors
-; gives the current kernel room to grow without overwriting our return code.
 mov al, 0x28
 mov ch, 0x00
 mov cl, 0x02
