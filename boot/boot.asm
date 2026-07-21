@@ -37,7 +37,7 @@ mov es, ax
 mov bx, KERNEL_LOCATION
 
 mov ah, 0x02
-mov al, 0x28
+mov al, 0x35
 mov ch, 0x00
 mov cl, 0x02
 mov dh, 0x00

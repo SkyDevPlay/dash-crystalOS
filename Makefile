@@ -40,7 +40,7 @@ OBJS=$(ASM_OBJS) $(C_OBJS)
 all: os.bin
 
 os.bin: obj/boot obj/kernel.bin part.bin
-	@test $$(wc -c < obj/kernel.bin) -le 20480 || (echo "Kernel exceeds boot loader limit (20480 bytes)"; false)
+	@test $$(wc -c < obj/kernel.bin) -le 27136 || (echo "Kernel exceeds boot loader limit (27136 bytes)"; false)
 	@echo "OUT   $@"
 	@cat obj/boot obj/kernel.bin > os.bin
 	@truncate -s 1048576 os.bin
